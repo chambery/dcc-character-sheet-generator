@@ -1,17 +1,24 @@
-# Bun + TypeScript
+A simple app to fill character sheet PDFs with generated valid data.
 
+Currently only supports Mark Anticole's 1st+ level Weird Frontiers character sheets (because [Purple Sorceror pretty much has everything else covered](https://purplesorcerer.com/create_party.php)), but you can fill any PDF:
+
+1. Use the [grid](https://github.com/chambery/dcc-character-sheet-generator/blob/052d387cb07f2af17190e3b889cf1d9234b5651f/src/assets/PDF%20Coordinates.png) as an overlay in a image editor to get field coordinates
+2. Copy your blank sheet to `src/assets`, named like `classname_blank.pdf`
+3. Create a file in `src/character_sheets` that follows the pattern of one of the existing files
+4. Run `bun src/main.ts classname`, eg. `bun src/main.ts classname`
+
+
+# Bun + TypeScript
 1. Install [Bun](https://bun.sh/)
 2. Install dependencies
    1. Run `bun install`
-3. Copy pdf files to the `assets` folder
-   1. Copy the `pdf` files from the `assets` folder in the `bun-typescript` repo to the `assets` folder in this repo
-   2. The `assets` folder should look like this:
-      ```
-      assets
-      └── luchador.pdf
-      └── occulist.pdf
-      ```
-   3. The `assets` folder should contain the following files:
+3. Copy pdf files (eg. `luchador_blank_v1.pdf`) to the `assets` folder
 4. Run the app
-   1. From the root of the project, run `bun src/main.ts [class-name]`, eg `bun src/main.ts luchador`
-```
+   - From the root of the project, run `bun src/main.ts [class-name]`, eg `bun src/main.ts luchador`
+5. it will output the full path of the filled-out character sheet, eg. `/Users/chambery/projects/dcc-character-sheets-generator/out/luchador-20250501132734.pdf`
+
+n.b. you can print directly to the default printer (in `fish`) using `lpr (bun src/main.ts luchador)`
+
+
+
+Special thanks to the greatest TTRPG of the modern
