@@ -3,9 +3,10 @@ A simple app to fill character sheet PDFs with generated valid data.
 Currently only supports Mark Anticole's 1st+ level Weird Frontiers character sheets (because [Purple Sorceror pretty much has everything else covered](https://purplesorcerer.com/create_party.php)), but you can fill any PDF:
 
 1. Use the [grid](https://github.com/chambery/dcc-character-sheet-generator/blob/052d387cb07f2af17190e3b889cf1d9234b5651f/src/assets/PDF%20Coordinates.png) as an overlay in a image editor to get field coordinates
-2. Copy your blank sheet to `src/assets`, named like `classname_blank.pdf`
+2. Copy your blank sheet to `src/assets`
 3. Create a file in `src/character_sheets` that follows the pattern of one of the existing files
-4. Run `bun src/main.ts classname`, eg. `bun src/main.ts classname`
+   - set the `filename` attribute to the name of the file you copied to `src/assets`
+5. Run `bun src/main.ts classname`, eg. `bun src/main.ts classname`
 
 
 # Bun + TypeScript
