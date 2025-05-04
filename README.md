@@ -22,4 +22,4 @@ n.b. you can print directly to the default printer (in `fish`) using `lpr (bun s
 
 
 
-Special thanks to the greatest TTRPG of the modern
+Special thanks to the greatest TTRPG of the modern era, [Dungeon Crawl Classics](https://goodman-games.com/dungeon-crawl-classics-rpg/) and its excellent designers Goodman Games!
