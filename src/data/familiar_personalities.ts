@@ -1,0 +1,22 @@
+export default [
+  'Grumpy',
+  'Hypochondriac',
+  'Braggart',
+  'Insulting',
+  'Greedy',
+  'Jolly',
+  'Sarcastic',
+  'Melancholy',
+  'Sleepy',
+  'Mellow',
+  'Loud',
+  'Paranoid',
+  'Fearful',
+  'Obsessive compulsive',
+  'Romantic',
+  'Complaining',
+  'Forgetful',
+  'Thoughtful',
+  'Comical',
+  'Demanding'
+]
