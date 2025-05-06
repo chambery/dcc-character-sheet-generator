@@ -3,15 +3,15 @@ import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import { DrawTextStyle } from './types'
 
 
-const process_pdf = async (file?: File, texts: { x: number, y: number, text: string, style?: DrawTextStyle }[] = [], font_size?: number = 12, offset?: { x: number, y: number }[]) => {
+const process_pdf = async (file?: File, sheets: { x: number, y: number, text: string, style?: DrawTextStyle }[][] = [], font_size: number = 12, offset?: { x: number, y: number }[]) => {
   // consol.og('processing pdf')
   if (!file) {
     // consol.og('Please select a PDF file first.')
     return
   }
 
-  if (texts.length === 0) {
-    // consol.og('Please add some text positions first.')
+  if (sheets.length === 0) {
+    console.log('Please add some text positions first.')
     return
   }
 
@@ -37,52 +37,38 @@ const process_pdf = async (file?: File, texts: { x: number, y: number, text: str
     const font = await pdfDoc.embedFont(StandardFonts.TimesRoman)
 
     // Add text at specified positions
-    texts.forEach(({ text, x, y, style }) => {
-      // consol.og('position ', x, y, text, style)
-      page.drawText(text, {
-        x: x,
-        y: y,
-        font: font,
-        size: style?.size ?? font_size,
-        color: style?.color ?? rgb(0, 0, 0),
-        maxWidth: style?.maxWidth,
-        lineHeight: style?.lineHeight
+    sheets.forEach((sheet, i: number) => {
+      console.log('sheet', i, sheet)
 
+
+      const x_offset = i > 0 ?
+        (offset) ?
+          offset.length <= i ?
+            /* reuse the pieces of a single offset */
+            [0, offset?.[0].x, 0, offset?.[0].x][i]
+            : offset[i - 1].x
+          : 0 : 0
+      const y_offset = i > 0 ?
+        (offset) ?
+          offset.length <= i ?
+            /* reuse the pieces of a single offset */
+            [0, 0, offset?.[0].y, offset?.[0].y][i]
+            : offset[i - 1].y
+          : 0 : 0
+      sheet.forEach(({ text, x, y, style }) => {
+        // console.log('position ', x + x_offset, y + y_offset, text, style)
+
+        page.drawText(text, {
+          x: x + x_offset,
+          y: y + y_offset,
+          font: font,
+          size: style?.size ?? font_size,
+          color: style?.color ?? rgb(0, 0, 0),
+          maxWidth: style?.maxWidth,
+          lineHeight: style?.lineHeight
+        })
       })
-
-      if (offset && offset.length > 0) {
-        page.drawText(text, {
-          x: x + (offset.length > 1 ? offset[0].x : 0),
-          y: y + offset[0].y,
-          font: font,
-          size: style?.size ?? font_size,
-          color: style?.color ?? rgb(0, 0, 0),
-          maxWidth: style?.maxWidth,
-          lineHeight: style?.lineHeight
-        })
-        page.drawText(text, {
-          x: x + (offset.length > 1 ? offset[1].x : offset[0].x),
-          y: y + (offset.length > 1 ? offset[1].y : 0),
-          font: font,
-          size: style?.size ?? font_size,
-          color: style?.color ?? rgb(0, 0, 0),
-          maxWidth: style?.maxWidth,
-          lineHeight: style?.lineHeight
-        })
-        page.drawText(text, {
-          x: x + (offset.length > 1 ? offset[2].x : offset[0].x),
-          y: y + (offset.length > 1 ? offset[2].y : offset[0].y),
-          font: font,
-          size: style?.size ?? font_size,
-          color: style?.color ?? rgb(0, 0, 0),
-          maxWidth: style?.maxWidth,
-          lineHeight: style?.lineHeight
-        })
-
-      }
-
     })
-
     // Save the modified PDF
     const modifiedPdfBytes = await pdfDoc.save()
 

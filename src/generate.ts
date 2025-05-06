@@ -1,38 +1,47 @@
 import { D100, D20, D6, roll } from '@randsum/dice'
+import _ from 'lodash'
 import path from 'path'
 import { RGB } from 'pdf-lib'
 import process_pdf from './process_pdf'
 import { PDF } from './types'
 
 const generate = async ([sheetname, level = '1']: string[]) => {
-  // consol.og(classname, level)
 
-  const resolvedPath = path.resolve('src/character_sheets/' + sheetname + '.ts');
-  const character_sheet = (await import(resolvedPath)).default as PDF
-  console.log(character_sheet.filename)
-  if (!character_sheet) { throw new Error('Invalid class name') }
-  const filePath = 'assets/' + character_sheet.filename
+  const resolvedPath = path.resolve('src/character_sheets/' + sheetname + '.ts')
+  const sheet = (await import(resolvedPath)).default as PDF
+  console.log(sheet.filename)
+  if (!sheet) { throw new Error('Invalid class name') }
+  const filePath = 'assets/' + sheet.filename
   /* +1 for 0-level rolls */
-  const scores = roll_dice(Number(level) + 1)
   const blob = Bun.file(filePath)
   const file = new File([blob], filePath)
 
-  const texts: { x: number, y: number, text: string, style?: { size?: number, color?: RGB } }[] = []
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Object.entries(character_sheet.fields).forEach(([key, field]) => {
-    const value = String(field.calc(scores))
-    // consol.og(key, value)
-    if (value == undefined) return
-    texts.push(
-      {
-        x: typeof field.x === 'function' ? field.x(scores) : field.x + (value.length == 1 ? 5 : 0),
-        y: typeof field.y === 'function' ? field.y(scores) : field.y,
-        text: value,
-        style: field.style
-      })
-  })
+  const sheets: { x: number, y: number, text: string, style?: { size?: number, color?: RGB } }[][] = []
 
-  const filepath = await process_pdf(file, texts, character_sheet.font_size, character_sheet.four_up_offset)
+
+  if (sheet.four_up_offset) {
+    _.times(4, () => {
+      const scores = roll_dice(Number(level) + 1)
+      const texts: { x: number, y: number, text: string, style?: { size?: number, color?: RGB } }[] = []
+      sheets.push(texts)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      Object.entries(sheet.fields).forEach(([key, field]) => {
+        const value = String(field.calc(scores))
+        // consol.og(key, value)
+        if (value == undefined) return
+        texts.push(
+          {
+            x: typeof field.x === 'function' ? field.x(scores) : field.x + (value.length == 1 ? 5 : 0),
+            y: typeof field.y === 'function' ? field.y(scores) : field.y,
+            text: value,
+            style: field.style
+          })
+      })
+    })
+  }
+
+  console.log('sheets', sheets)
+  const filepath = await process_pdf(file, sheets, sheet.font_size, sheet.four_up_offset)
   // consol.og('PDF generated:', filepath)
   return filepath
 }
