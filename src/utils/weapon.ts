@@ -1,5 +1,5 @@
-import firearms from "../data/firearms"
-import occupations from "../data/occupations"
+import firearms from "../data/weird_frontiers/firearms"
+import occupations from "../data/weird_frontiers/occupations"
 import { Stats } from "../types"
 
 const weapon = (scores: Stats) => {

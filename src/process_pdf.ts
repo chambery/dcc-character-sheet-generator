@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
+import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import { DrawTextStyle } from './types'
 
 
-const process_pdf = async (file?: File, texts: { x: number, y: number, text: string, style?: DrawTextStyle }[] = []) => {
+const process_pdf = async (file?: File, texts: { x: number, y: number, text: string, style?: DrawTextStyle }[] = [], font_size?: number = 12, offset?: { x: number, y: number }[]) => {
   // consol.og('processing pdf')
   if (!file) {
     // consol.og('Please select a PDF file first.')
@@ -30,7 +30,8 @@ const process_pdf = async (file?: File, texts: { x: number, y: number, text: str
       // consol.og('PDF has no pages.')
       return
     }
-    const firstPage = pages[0]
+    const page = pages[0]
+    page.setRotation(degrees(90))
 
     // Embed a font (optional, but good practice)
     const font = await pdfDoc.embedFont(StandardFonts.TimesRoman)
@@ -38,16 +39,47 @@ const process_pdf = async (file?: File, texts: { x: number, y: number, text: str
     // Add text at specified positions
     texts.forEach(({ text, x, y, style }) => {
       // consol.og('position ', x, y, text, style)
-      firstPage.drawText(text, {
+      page.drawText(text, {
         x: x,
         y: y,
         font: font,
-        size: style?.size ?? 12,
+        size: style?.size ?? font_size,
         color: style?.color ?? rgb(0, 0, 0),
         maxWidth: style?.maxWidth,
         lineHeight: style?.lineHeight
 
       })
+
+      if (offset && offset.length > 0) {
+        page.drawText(text, {
+          x: x + (offset.length > 1 ? offset[0].x : 0),
+          y: y + offset[0].y,
+          font: font,
+          size: style?.size ?? font_size,
+          color: style?.color ?? rgb(0, 0, 0),
+          maxWidth: style?.maxWidth,
+          lineHeight: style?.lineHeight
+        })
+        page.drawText(text, {
+          x: x + (offset.length > 1 ? offset[1].x : offset[0].x),
+          y: y + (offset.length > 1 ? offset[1].y : 0),
+          font: font,
+          size: style?.size ?? font_size,
+          color: style?.color ?? rgb(0, 0, 0),
+          maxWidth: style?.maxWidth,
+          lineHeight: style?.lineHeight
+        })
+        page.drawText(text, {
+          x: x + (offset.length > 1 ? offset[2].x : offset[0].x),
+          y: y + (offset.length > 1 ? offset[2].y : offset[0].y),
+          font: font,
+          size: style?.size ?? font_size,
+          color: style?.color ?? rgb(0, 0, 0),
+          maxWidth: style?.maxWidth,
+          lineHeight: style?.lineHeight
+        })
+
+      }
 
     })
 
@@ -57,7 +89,7 @@ const process_pdf = async (file?: File, texts: { x: number, y: number, text: str
     // Create a Blob from the bytes
     const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' })
 
-    const filePath = 'out/' + file.name.substring(0, file.name.indexOf('_')) + dayjs().format('YYMMDDHHmmss') + '.pdf'
+    const filePath = 'out/' + file.name.substring(file.name.lastIndexOf('/') + 1, file.name.indexOf('_')) + dayjs().format('YYMMDDHHmmss') + '.pdf'
     await Bun.write(filePath, blob)
     // consol.og(`Blob successfully written to ${filePath}`)
 

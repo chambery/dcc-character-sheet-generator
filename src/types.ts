@@ -25,6 +25,9 @@ export type Location = {
 }
 export type PDF = {
   filename: string
+  four_up_offset?: { x: number, y: number }[]
+  font_size?: number
+  orientation?: 'portrait' | 'landscape'
   fields: {
     [key: string]: Location
   }

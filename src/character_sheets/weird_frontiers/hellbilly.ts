@@ -1,32 +1,32 @@
 import { D12 } from "@randsum/dice"
-import { Stats } from "../types"
-import add_plus from "../utils/add_plus"
-import birth_augur from "../utils/birth_augur"
-import damage from "../utils/damage"
-import firearm from "../utils/firearm"
-import hp from "../utils/hp"
-import ability_modifier from "../utils/modifier"
-import occupation from "../utils/occupation"
-import weapon from "../utils/weapon"
+import { Stats } from "../../types"
+import birth_augur from "../../utils/birth_augur"
+import damage from "../../utils/damage"
+import firearm from "../../utils/firearm"
+import hp from "../../utils/hp"
+import ability_modifier from "../../utils/modifier"
+import occupation from "../../utils/occupation"
+import weapon from "../../utils/weapon"
+import decorate from "../../utils/decorate"
 
 export default {
-    filename: 'luchador_blank_v1.pdf',
+    filename: './hellbilly_blank_v1.pdf',
     fields: {
       str: { x: 32, y: 638, calc: (scores: Stats) => scores['str'] },
-      str_mod: { x: 60, y: 638, calc: (scores: Stats) => add_plus(ability_modifier(scores['str'])) },
+      str_mod: { x: 60, y: 638, calc: (scores: Stats) => decorate(ability_modifier(scores['str']), ['+']) },
       agl: { x: 32, y: 594, calc: (scores: Stats) => scores['agl'] },
-      agl_mod: { x: 60, y: 594, calc: (scores: Stats) => add_plus(ability_modifier(scores['agl'])) },
+      agl_mod: { x: 60, y: 594, calc: (scores: Stats) => decorate(ability_modifier(scores['agl']), ['+']) },
       sta: { x: 32, y: 550, calc: (scores: Stats) => scores['sta'] },
-      sta_mod: { x: 60, y: 550, calc: (scores: Stats) => add_plus(ability_modifier(scores['sta'])) },
+      sta_mod: { x: 60, y: 550, calc: (scores: Stats) => decorate(ability_modifier(scores['sta']), ['+']) },
       per: { x: 32, y: 505, calc: (scores: Stats) => scores['per'] },
-      per_mod: { x: 60, y: 505, calc: (scores: Stats) => add_plus(ability_modifier(scores['per'])) },
+      per_mod: { x: 60, y: 505, calc: (scores: Stats) => decorate(ability_modifier(scores['per']), ['+']) },
       int: { x: 32, y: 462, calc: (scores: Stats) => scores['int'] },
-      int_mod: { x: 60, y: 462, calc: (scores: Stats) => add_plus(ability_modifier(scores['int'])) },
+      int_mod: { x: 60, y: 462, calc: (scores: Stats) => decorate(ability_modifier(scores['int']), ['+']) },
       luck: { x: 32, y: 420, calc: (scores: Stats) => scores['luck'] },
-      luck_mod: { x: 60, y: 420, calc: (scores: Stats) => add_plus(ability_modifier(scores['luck'])) },
-      ref: { x: 100, y: 591, calc: (scores: Stats) => add_plus(ability_modifier(scores['agl'], 1)) },
-      fort: { x: 100, y: 546, calc: (scores: Stats) => add_plus(ability_modifier(scores['sta'], 1)) },
-      will: { x: 100, y: 503, calc: (scores: Stats) => add_plus(ability_modifier(scores['per'])) },
+      luck_mod: { x: 60, y: 420, calc: (scores: Stats) => decorate(ability_modifier(scores['luck']), ['+']) },
+      ref: { x: 100, y: 591, calc: (scores: Stats) => decorate(ability_modifier(scores['agl']), ['+']) },
+      fort: { x: 100, y: 546, calc: (scores: Stats) => decorate(ability_modifier(scores['sta'], 1), ['+']) },
+      will: { x: 100, y: 503, calc: (scores: Stats) => decorate(ability_modifier(scores['per'], 1), ['+']) },
       grit: {
         x: 94, y: 470, calc: (scores: Stats) => Math.floor((scores['per'] + scores['sta']) / 2),
         style: { size: 6, maxWidth: 20, lineHeight: 7 }
@@ -61,8 +61,6 @@ export default {
         x: 150, y: 582, calc: (scores: Stats) => firearm(scores),
         style: { size: 6 }
       },
-      lucha_die: { x: 94, y: 310, calc: () => '+d3' },
-      battle_hardened: { x: 155, y: 130, calc: () => '1d8' },
-      fame: { x: 38, y: 57, calc: () => '35%' },
+      ballad_die: { x: 94, y: 310, calc: () => '+d3' },
     }
   }

@@ -1,4 +1,4 @@
-import occupations from "../data/occupations"
+import occupations from "../data/weird_frontiers/occupations"
 import { Stats } from "../types"
 
 const occupation = (scores: Stats) => {

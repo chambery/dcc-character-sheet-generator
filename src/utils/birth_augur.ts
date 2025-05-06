@@ -1,4 +1,4 @@
-import birth_augurs from "../data/birth_augurs"
+import birth_augurs from "../data/weird_frontiers/birth_augurs"
 import { Stats } from "../types"
 
 const birth_augur = (scores: Stats) => {

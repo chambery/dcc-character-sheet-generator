@@ -4,13 +4,14 @@ import { RGB } from 'pdf-lib'
 import process_pdf from './process_pdf'
 import { PDF } from './types'
 
-const generate = async ([classname, level = '1']: string[]) => {
+const generate = async ([sheetname, level = '1']: string[]) => {
   // consol.og(classname, level)
-  const resolvedPath = path.resolve('src/character_sheets/' + classname + '.ts');
+
+  const resolvedPath = path.resolve('src/character_sheets/' + sheetname + '.ts');
   const character_sheet = (await import(resolvedPath)).default as PDF
   console.log(character_sheet.filename)
   if (!character_sheet) { throw new Error('Invalid class name') }
-  const filePath = 'src/assets/' + character_sheet.filename
+  const filePath = 'assets/' + character_sheet.filename
   /* +1 for 0-level rolls */
   const scores = roll_dice(Number(level) + 1)
   const blob = Bun.file(filePath)
@@ -31,7 +32,7 @@ const generate = async ([classname, level = '1']: string[]) => {
       })
   })
 
-  const filepath = await process_pdf(file, texts)
+  const filepath = await process_pdf(file, texts, character_sheet.font_size, character_sheet.four_up_offset)
   // consol.og('PDF generated:', filepath)
   return filepath
 }
