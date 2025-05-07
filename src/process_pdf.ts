@@ -1,9 +1,8 @@
-import dayjs from 'dayjs'
 import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import { DrawTextStyle } from './types'
 
 
-const process_pdf = async (file?: File, sheets: { x: number, y: number, text: string, style?: DrawTextStyle }[][] = [], font_size: number = 12, offset?: { x: number, y: number }[]) => {
+const process_pdf = async (file?: File, sheets: { x: number, y: number, text: string, style?: DrawTextStyle }[][] = [], font_size: number = 12) => {
   // consol.og('processing pdf')
   if (!file) {
     // consol.og('Please select a PDF file first.')
@@ -40,27 +39,12 @@ const process_pdf = async (file?: File, sheets: { x: number, y: number, text: st
     sheets.forEach((sheet, i: number) => {
       console.log('sheet', i, sheet)
 
-
-      const x_offset = i > 0 ?
-        (offset) ?
-          offset.length <= i ?
-            /* reuse the pieces of a single offset */
-            [0, offset?.[0].x, 0, offset?.[0].x][i]
-            : offset[i - 1].x
-          : 0 : 0
-      const y_offset = i > 0 ?
-        (offset) ?
-          offset.length <= i ?
-            /* reuse the pieces of a single offset */
-            [0, 0, offset?.[0].y, offset?.[0].y][i]
-            : offset[i - 1].y
-          : 0 : 0
       sheet.forEach(({ text, x, y, style }) => {
         // console.log('position ', x + x_offset, y + y_offset, text, style)
 
         page.drawText(text, {
-          x: x + x_offset,
-          y: y + y_offset,
+          x: x,
+          y: y,
           font: font,
           size: style?.size ?? font_size,
           color: style?.color ?? rgb(0, 0, 0),
@@ -75,7 +59,7 @@ const process_pdf = async (file?: File, sheets: { x: number, y: number, text: st
     // Create a Blob from the bytes
     const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' })
 
-    const filePath = 'out/' + file.name.substring(file.name.lastIndexOf('/') + 1, file.name.indexOf('_')) + dayjs().format('YYMMDDHHmmss') + '.pdf'
+    const filePath = 'out/' + file.name.substring(file.name.lastIndexOf('/') + 1, file.name.indexOf('_')) + '.pdf' // dayjs().format('YYMMDDHHmmss') + 
     await Bun.write(filePath, blob)
     // consol.og(`Blob successfully written to ${filePath}`)
 

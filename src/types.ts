@@ -10,6 +10,7 @@ export type Stats = {
 } & {
   [key: string]: number
 }
+
 export type DrawTextStyle = {
   size?: number,
   color?: RGB,
@@ -23,12 +24,20 @@ export type Location = {
   calc: (scores: Stats) => string | number | undefined,
   style?: DrawTextStyle
 }
+
 export type PDF = {
   filename: string
-  four_up_offset?: { x: number, y: number }[]
+  system: string
+  /* provide one Point to have the same offsets applied to all four cards, more to for specific offsets */
+  offset?: Point[]
   font_size?: number
   orientation?: 'portrait' | 'landscape'
   fields: {
     [key: string]: Location
   }
+}
+
+export type Point = {
+  x: number,
+  y: number
 }

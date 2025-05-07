@@ -11,6 +11,7 @@ import weapon from "../../utils/weapon"
 
 export default  {
     filename: 'sineater_blank_v1.pdf',
+    system: 'weird_frontiers',
     fields: {
       str: { x: 32, y: 638, calc: (scores: Stats) => scores['str'] },
       str_mod: { x: 60, y: 638, calc: (scores: Stats) => decorate(ability_modifier(scores['str']), ['+']) },
@@ -38,8 +39,8 @@ export default  {
       fumble: { x: 285, y: 634, calc: () => 'd12' },
       wealth: { x: 340, y: 695, calc: () => '$' + D12.roll(), style: { size: 6 } },
       birth_augur: {
-        x: 80, y: (scores: Stats) => birth_augur(scores).length >= 78 ? 396 : 390,
-        calc: (scores: Stats) => birth_augur(scores),
+        x: 80, y: async (scores: Stats) => (await birth_augur(scores)).length >= 78 ? 396 : 390,
+        calc: async (scores: Stats) => birth_augur(scores),
         style: { size: 7, maxWidth: 223, lineHeight: 6 }
         // style: { size: 8, maxWidth: 200, lineHeight: 10 }
       },

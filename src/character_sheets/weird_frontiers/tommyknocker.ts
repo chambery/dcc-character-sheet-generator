@@ -2,15 +2,16 @@ import { D12 } from "@randsum/dice"
 import { Stats } from "../../types"
 import birth_augur from "../../utils/birth_augur"
 import damage from "../../utils/damage"
+import decorate from "../../utils/decorate"
 import firearm from "../../utils/firearm"
 import hp from "../../utils/hp"
 import ability_modifier from "../../utils/modifier"
 import occupation from "../../utils/occupation"
 import weapon from "../../utils/weapon"
-import decorate from "../../utils/decorate"
 
 export default {
     filename: 'tommyknocker_blank_v1.pdf',
+    system: 'weird_frontiers',
     fields: {
       str: { x: 32, y: 638, calc: (scores: Stats) => scores['str'] },
       str_mod: { x: 60, y: 638, calc: (scores: Stats) => decorate(ability_modifier(scores['str']), ['+']) },
@@ -37,8 +38,8 @@ export default {
       fumble: { x: 285, y: 634, calc: () => 'd12' },
       wealth: { x: 340, y: 695, calc: () => '$' + D12.roll(), style: { size: 6 } },
       birth_augur: {
-        x: 80, y: (scores: Stats) => birth_augur(scores).length >= 78 ? 396 : 390,
-        calc: (scores: Stats) => birth_augur(scores),
+        x: 80, y: async (scores: Stats) => (await birth_augur(scores)).length >= 78 ? 396 : 390,
+        calc: async (scores: Stats) => birth_augur(scores),
         style: { size: 7, maxWidth: 223, lineHeight: 6 }
       },
       // birth_augur_description: {
