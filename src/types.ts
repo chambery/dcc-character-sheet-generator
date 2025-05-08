@@ -19,8 +19,8 @@ export type DrawTextStyle = {
 }
 
 export type Location = {
-  x: number | ((scores: Stats) => number),
-  y: number | ((scores: Stats) => number),
+  x: number | ((scores: Stats) => Promise<number>),
+  y: number | ((scores: Stats) => Promise<number>),
   calc: (scores: Stats) => string | number | undefined,
   style?: DrawTextStyle
 }

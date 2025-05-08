@@ -6,6 +6,14 @@
   ],
   "compilerOptions": {
     "noUnusedParameters": false,
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "paths": {
+      "@data/*": [
+        "./src/data/*"
+      ],
+      "@assets/*": [
+        "./src/assets/*"
+      ]
+    }
   }
 }

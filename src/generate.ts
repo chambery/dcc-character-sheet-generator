@@ -3,13 +3,20 @@ import path from 'path'
 import { RGB } from 'pdf-lib'
 import process_pdf from './process_pdf'
 import { PDF, Point } from './types'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-declare let system: string  
+
+
+declare global {
+  // eslint-disable-next-line no-var
+  var system: string | undefined
+}
 
 const generate = async ([sheetname, level = '1']: string[]) => {
 
   const resolvedPath = path.resolve('src/character_sheets/' + sheetname + '.ts')
   const sheet = (await import(resolvedPath)).default as PDF
+  globalThis.system = sheet.system as string
+  console.log('system', globalThis.system)
+
   console.log(sheet.filename)
   if (!sheet) { throw new Error('Invalid class name') }
   const filePath = 'assets/' + sheet.filename
@@ -31,29 +38,28 @@ const generate = async ([sheetname, level = '1']: string[]) => {
 
   (sheet.offset = sheet.offset ?? []).push({ x: 0, y: 0 })
 
-  console.log('sheet.offset(s)', sheet.offset);
-  system = sheet.system
+  console.log('sheet.offset(s)', sheet.offset)
 
-  const sheets = sheet.offset.map((point: Point) => {
+  const sheets = await Promise.all(sheet.offset.map(async (point: Point) => {
     const scores = roll_dice(Number(level) + 1)
     const texts: { x: number, y: number, text: string, style?: { size?: number, color?: RGB } }[] = []
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    Object.entries(sheet.fields).forEach(([key, field]) => {
-      const value = String(field.calc(scores))
+    await Promise.all(Object.entries(sheet.fields).map(async ([key, field]) => {
+      const value = String(await field.calc(scores))
       // consol.og(key, value)
       if (value == undefined) return
       texts.push(
         {
-          x: (typeof field.x === 'function' ? field.x(scores) : field.x + (value.length == 1 ? 5 : 0)) + point.x,
-          y: (typeof field.y === 'function' ? field.y(scores) : field.y) + point.y,
+          x: (typeof field.x === 'function' ? await field.x(scores) : field.x + (value.length == 1 ? 5 : 0)) + point.x,
+          y: (typeof field.y === 'function' ? await field.y(scores) : field.y) + point.y,
           text: value,
           style: field.style
         })
-    })
+    }))
     return texts
-  })
+  }))
 
-  console.log('sheets', sheets)
+  // console.log('sheets', sheets)
   const filepath = await process_pdf(file, sheets, sheet.font_size)
   // consol.og('PDF generated:', filepath)
   return filepath

@@ -3,9 +3,10 @@ import { Stats } from "../../types"
 import birth_augur from "../../utils/birth_augur"
 import decorate from "../../utils/decorate"
 import ability_modifier from "../../utils/modifier"
+import occupation from "../../utils/occupation"
 
 export default {
-  filename: 'DCC_GF_L0_4up_sketchy.pdf',
+  filename: 'DCC_GF_L0_4up_sketchy+.5.pdf',
   system: 'dcc',
   orientation: 'landscape',
   /* provide one Point to have the same offsets applied to all four cards, more to for specific offsets */
@@ -21,9 +22,10 @@ export default {
     per: { x: 112, y: 290, calc: (scores: Stats) => scores['per'] },
     per_mod: { x: 132, y: 290, calc: (scores: Stats) => decorate(ability_modifier(scores['per']), ['+']) },
     birth_augur: {
-      x: 80, y: async (scores: Stats) => (await birth_augur(scores)).length >= 78 ? 396 : 390,
+      x: 85, y: async (scores: Stats) => (await birth_augur(scores)).length >= 78 ? 206 : 200,
       calc: async (scores: Stats) => await birth_augur(scores, EXCLUDE_DESCRIPTION),
       style: { size: 7, maxWidth: 200, lineHeight: 10 }
     },
+    occupation: { x:168, y: 360, calc: async (scores: Stats) => await occupation(scores) }
   }
 }

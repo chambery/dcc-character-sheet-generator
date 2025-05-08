@@ -39,7 +39,7 @@ export default {
     wealth: { x: 340, y: 695, calc: () => '$' + D12.roll(), style: { size: 6 } },
     birth_augur: {
       x: 80, y: async (scores: Stats) => (await birth_augur(scores)).length >= 78 ? 396 : 390,
-      calc: async (scores: Stats) => birth_augur(scores),
+      calc: async (scores: Stats) => await birth_augur(scores),
       style: { size: 7, maxWidth: 223, lineHeight: 6 }
       // style: { size: 8, maxWidth: 200, lineHeight: 10 }
     },
