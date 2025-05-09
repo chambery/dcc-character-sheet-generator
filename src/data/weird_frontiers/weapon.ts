@@ -1,6 +1,6 @@
-import firearms from "../data/weird_frontiers/firearms"
-import occupations from "../data/weird_frontiers/occupations"
-import { Stats } from "../types"
+import { Stats } from "../../types"
+import firearms from "./firearms"
+import occupations from "./occupations"
 
 const weapon = (scores: Stats) => {
   /* rolls start at 1 */

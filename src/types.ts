@@ -30,7 +30,7 @@ export type PDF = {
   system: string
   /* provide one Point to have the same offsets applied to all four cards, more to for specific offsets */
   offset?: Point[]
-  font_size?: number
+  style?: {font_size?: number}
   orientation?: 'portrait' | 'landscape'
   fields: {
     [key: string]: Location

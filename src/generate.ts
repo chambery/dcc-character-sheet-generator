@@ -38,7 +38,7 @@ const generate = async ([sheetname, level = '1']: string[]) => {
 
   (sheet.offset = sheet.offset ?? []).push({ x: 0, y: 0 })
 
-  console.log('sheet.offset(s)', sheet.offset)
+  // console.log('sheet.offset(s)', sheet.offset)
 
   const sheets = await Promise.all(sheet.offset.map(async (point: Point) => {
     const scores = roll_dice(Number(level) + 1)
@@ -50,7 +50,7 @@ const generate = async ([sheetname, level = '1']: string[]) => {
       if (value == undefined) return
       texts.push(
         {
-          x: (typeof field.x === 'function' ? await field.x(scores) : field.x + (value.length == 1 ? 5 : 0)) + point.x,
+          x: (typeof field.x === 'function' ? await field.x(scores) : field.x + (value.length == 1 ? 2 : 0)) + point.x,
           y: (typeof field.y === 'function' ? await field.y(scores) : field.y) + point.y,
           text: value,
           style: field.style
@@ -60,7 +60,7 @@ const generate = async ([sheetname, level = '1']: string[]) => {
   }))
 
   // console.log('sheets', sheets)
-  const filepath = await process_pdf(file, sheets, sheet.font_size)
+  const filepath = await process_pdf(file, sheets, sheet.style)
   // consol.og('PDF generated:', filepath)
   return filepath
 }
