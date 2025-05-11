@@ -12,7 +12,7 @@ export default {
   filename: 'DCC_GF_L0_4up_sketchy-square.pdf',
   system: 'dcc',
   orientation: 'landscape',
-  style: { font_size: 10 },
+  style: { font_size: 24 },
   /* provide one Point to have the same offsets applied to all four cards, more to for specific offsets */
   // offset: [{ x: 366, y: 267 },],
   offset: [{ x: 0, y: 267 }, { x: 366, y: 0 }, { x: 366, y: 267 },],

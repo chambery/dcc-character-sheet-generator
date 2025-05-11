@@ -53,7 +53,7 @@ const generate = async ([sheetname, level = '1']: string[]) => {
           x: (typeof field.x === 'function' ? await field.x(scores) : field.x + (value.length == 1 ? 2 : 0)) + point.x,
           y: (typeof field.y === 'function' ? await field.y(scores) : field.y) + point.y,
           text: value,
-          style: field.style
+          style: (typeof field.style === 'function' ? await field.style(scores) : field.style)
         })
     }))
     return texts
@@ -61,6 +61,7 @@ const generate = async ([sheetname, level = '1']: string[]) => {
 
   // console.log('sheets', sheets)
   const filepath = await process_pdf(file, sheets, sheet.style)
+  // const filepath = await process_bare_pdf(file, sheets)
   // consol.og('PDF generated:', filepath)
   return filepath
 }

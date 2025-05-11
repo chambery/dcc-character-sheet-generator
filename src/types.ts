@@ -1,4 +1,4 @@
-import { RGB } from "pdf-lib"
+import { Degrees, RGB } from "pdf-lib"
 
 export type Stats = {
   str: number
@@ -15,14 +15,15 @@ export type DrawTextStyle = {
   size?: number,
   color?: RGB,
   maxWidth?: number,
-  lineHeight?: number
-}
+  lineHeight?: number,
+  rotate?: Degrees
+  }
 
 export type Location = {
   x: number | ((scores: Stats) => Promise<number>),
   y: number | ((scores: Stats) => Promise<number>),
   calc: (scores: Stats) => string | number | undefined,
-  style?: DrawTextStyle
+  style?: DrawTextStyle | ((scores: Stats) => Promise<DrawTextStyle>)
 }
 
 export type PDF = {

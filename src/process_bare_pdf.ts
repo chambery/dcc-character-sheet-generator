@@ -2,7 +2,7 @@ import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import { DrawTextStyle } from './types'
 
 
-const process_bare_pdf = async (file: File, sheets: { x: number, y: number, text: string, style?: DrawTextStyle }[][] = [], font_size: number = 12) => {
+const process_bare_pdf = async (file: File, sheets: { x: number, y: number, text: string, style?: DrawTextStyle }[][] = [], font_size: number = 4) => {
   // consol.og('processing pdf')
   if (sheets.length === 0) {
     console.log('Please add some text positions first.')
@@ -13,12 +13,20 @@ const process_bare_pdf = async (file: File, sheets: { x: number, y: number, text
 
   try {
     // Read the selected file as an ArrayBuffer
-    // const arrayBuffer = await file.arrayBuffer()
+    const arrayBuffer = await file.arrayBuffer()
 
     // Load the PDF document
-    const pdfDoc = await PDFDocument.create()
+    // const pdfDoc = await PDFDocument.create()
+    const pdfDoc = await PDFDocument.load(arrayBuffer)
 
-    const page = pdfDoc.addPage()
+    // const page = pdfDoc.addPage()
+    const pages = pdfDoc.getPages()
+    if (pages.length === 0) {
+      // consol.og('PDF has no pages.')
+      return
+    }
+    const page = pages[0]
+
     page.setRotation(degrees(90))
 
     // Embed a font (optional, but good practice)
@@ -29,10 +37,45 @@ const process_bare_pdf = async (file: File, sheets: { x: number, y: number, text
       console.log('sheet', i, sheet)
 
       sheet.forEach(({ text, x, y, style }) => {
-        // console.log('position ', x + x_offset, y + y_offset, text, style)
+        console.log('position ', x, y, text, style)
+        page.drawLine({
+          start: { x: x, y: 0 },
+          end: { x: x, y: 300 },
+          thickness: 1,
+          color: rgb(0, 0, 0),
+          opacity: 0.2,
+        })
+        console.log('after  vert drawLine')
+        page.drawLine({
+          start: { x: 0, y: y },
+          end: { x: 380, y: y },
+          thickness: 1,
+          color: rgb(0, 0, 0),
+          opacity: 0.2,
+        })
+        console.log('after  horisz drawLine')
 
         page.drawText(text, {
           x: x,
+          y: y,
+          font: font,
+          size: style?.size ?? font_size,
+          color: style?.color ?? rgb(0, 0, 0),
+          maxWidth: style?.maxWidth,
+          lineHeight: style?.lineHeight
+        })
+
+        page.drawText(text, {
+          x: x,
+          y: 40,
+          font: font,
+          size: style?.size ?? font_size,
+          color: style?.color ?? rgb(0, 0, 0),
+          maxWidth: style?.maxWidth,
+          lineHeight: style?.lineHeight
+        })
+        page.drawText(text, {
+          x: 380,
           y: y,
           font: font,
           size: style?.size ?? font_size,
@@ -45,10 +88,11 @@ const process_bare_pdf = async (file: File, sheets: { x: number, y: number, text
     // Save the modified PDF
     const modifiedPdfBytes = await pdfDoc.save()
 
-    // Create a Blob from the bytes
+    // Create a Blob from the bytes 
     const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' })
 
-    const filePath = 'out/' + file.name.substring(file.name.lastIndexOf('/') + 1, file.name.indexOf('_')) + '.pdf' // dayjs().format('YYMMDDHHmmss') + 
+    const filePath = 'out/DCC-coord.pdf' // dayjs().format('YYMMDDHHmmss') + 
+    console.log('filePath', filePath)
     await Bun.write(filePath, blob)
     // consol.og(`Blob successfully written to ${filePath}`)
 

@@ -65,7 +65,8 @@ const process_pdf = async (file?: File, sheets: { x: number, y: number, text: st
           size: style?.size ?? page_style.font_size,
           color: style?.color ?? rgb(0, 0, 0),
           maxWidth: style?.maxWidth,
-          lineHeight: style?.lineHeight
+          lineHeight: style?.lineHeight,
+          rotate: style?.rotate
         })
       })
     })
