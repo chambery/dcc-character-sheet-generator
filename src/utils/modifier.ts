@@ -1,3 +1,9 @@
+/**
+ * Returns the modifier for a given ability score.
+ * @param score ability score
+ * @param addl_mod additional modifier to add to the modifier
+ * @returns modifier
+ */
 const ability_modifier = (score: number, addl_mod?: number) => {
   const mods = [
     -3,

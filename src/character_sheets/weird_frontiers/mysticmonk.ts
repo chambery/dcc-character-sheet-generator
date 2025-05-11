@@ -1,32 +1,33 @@
 import { D12 } from "@randsum/dice"
-import { Stats } from "../types"
-import add_plus from "../utils/add_plus"
-import birth_augur from "../utils/birth_augur"
-import damage from "../utils/damage"
-import firearm from "../utils/firearm"
-import hp from "../utils/hp"
-import ability_modifier from "../utils/modifier"
-import occupation from "../utils/occupation"
-import weapon from "../utils/weapon"
+import weapon from "../../data/weird_frontiers/weapon"
+import { Stats } from "../../types"
+import birth_augur from "../../utils/birth_augur"
+import damage from "../../utils/damage"
+import decorate from "../../utils/decorate"
+import firearm from "../../utils/firearm"
+import hp from "../../utils/hp"
+import ability_modifier from "../../utils/modifier"
+import occupation from "../../utils/occupation"
 
 export default {
     filename: 'mysticmonk_blank_v1.pdf',
+    system: 'weird_frontiers',
     fields: {
       str: { x: 32, y: 638, calc: (scores: Stats) => scores['str'] },
-      str_mod: { x: 60, y: 638, calc: (scores: Stats) => add_plus(ability_modifier(scores['str'])) },
+      str_mod: { x: 60, y: 638, calc: (scores: Stats) => decorate(ability_modifier(scores['str']), ['+']) },
       agl: { x: 32, y: 594, calc: (scores: Stats) => scores['agl'] },
-      agl_mod: { x: 60, y: 594, calc: (scores: Stats) => add_plus(ability_modifier(scores['agl'])) },
+      agl_mod: { x: 60, y: 594, calc: (scores: Stats) => decorate(ability_modifier(scores['agl']), ['+']) },
       sta: { x: 32, y: 550, calc: (scores: Stats) => scores['sta'] },
-      sta_mod: { x: 60, y: 550, calc: (scores: Stats) => add_plus(ability_modifier(scores['sta'])) },
+      sta_mod: { x: 60, y: 550, calc: (scores: Stats) => decorate(ability_modifier(scores['sta']), ['+']) },
       per: { x: 32, y: 505, calc: (scores: Stats) => scores['per'] },
-      per_mod: { x: 60, y: 505, calc: (scores: Stats) => add_plus(ability_modifier(scores['per'])) },
+      per_mod: { x: 60, y: 505, calc: (scores: Stats) => decorate(ability_modifier(scores['per']), ['+']) },
       int: { x: 32, y: 462, calc: (scores: Stats) => scores['int'] },
-      int_mod: { x: 60, y: 462, calc: (scores: Stats) => add_plus(ability_modifier(scores['int'])) },
+      int_mod: { x: 60, y: 462, calc: (scores: Stats) => decorate(ability_modifier(scores['int']), ['+']) },
       luck: { x: 32, y: 420, calc: (scores: Stats) => scores['luck'] },
-      luck_mod: { x: 60, y: 420, calc: (scores: Stats) => add_plus(ability_modifier(scores['luck'])) },
-      ref: { x: 100, y: 591, calc: (scores: Stats) => add_plus(ability_modifier(scores['agl'], 1)) },
-      fort: { x: 100, y: 546, calc: (scores: Stats) => add_plus(ability_modifier(scores['sta'])) },
-      will: { x: 100, y: 503, calc: (scores: Stats) => add_plus(ability_modifier(scores['per'], 1)) },
+      luck_mod: { x: 60, y: 420, calc: (scores: Stats) => decorate(ability_modifier(scores['luck']), ['+']) },
+      ref: { x: 100, y: 591, calc: (scores: Stats) => decorate(ability_modifier(scores['agl'], 1), ['+']) },
+      fort: { x: 100, y: 546, calc: (scores: Stats) => decorate(ability_modifier(scores['sta']), ['+']) },
+      will: { x: 100, y: 503, calc: (scores: Stats) => decorate(ability_modifier(scores['per'], 1), ['+']) },
       grit: {
         x: 94, y: 470, calc: (scores: Stats) => Math.floor((scores['per'] + scores['sta']) / 2),
         style: { size: 6, maxWidth: 20, lineHeight: 7 }
@@ -38,8 +39,8 @@ export default {
       fumble: { x: 285, y: 634, calc: () => 'd12' },
       wealth: { x: 340, y: 695, calc: () => '$' + D12.roll(), style: { size: 6 } },
       birth_augur: {
-        x: 80, y: (scores: Stats) => birth_augur(scores).length >= 78 ? 396 : 390,
-        calc: (scores: Stats) => birth_augur(scores),
+        x: 80, y: async (scores: Stats) => (await birth_augur(scores)).length >= 78 ? 396 : 390,
+        calc: async (scores: Stats) => await birth_augur(scores),
         style: { size: 7, maxWidth: 223, lineHeight: 6 }
       },
       // birth_augur_description: {

@@ -1,8 +1,11 @@
-import occupations from "../data/occupations"
+import path from 'path'
 import { Stats } from "../types"
 
-const occupation = (scores: Stats) => {
-  // consol.og('occupation index', scores['occupation'])
+
+const occupation = async (scores: Stats): Promise<string> => {
+  const resolvedPath = path.resolve('src/data/' + system + '/occupations.ts')
+  const occupations = (await import(resolvedPath)).default
+
   /* rolls start at 1 */
   return occupations[scores['occupation'] - 1].name
 }

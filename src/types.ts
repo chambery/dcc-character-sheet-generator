@@ -1,4 +1,4 @@
-import { RGB } from "pdf-lib"
+import { Degrees, RGB } from "pdf-lib"
 
 export type Stats = {
   str: number
@@ -10,22 +10,35 @@ export type Stats = {
 } & {
   [key: string]: number
 }
+
 export type DrawTextStyle = {
   size?: number,
   color?: RGB,
   maxWidth?: number,
-  lineHeight?: number
-}
+  lineHeight?: number,
+  rotate?: Degrees
+  }
 
 export type Location = {
-  x: number | ((scores: Stats) => number),
-  y: number | ((scores: Stats) => number),
+  x: number | ((scores: Stats) => Promise<number>),
+  y: number | ((scores: Stats) => Promise<number>),
   calc: (scores: Stats) => string | number | undefined,
-  style?: DrawTextStyle
+  style?: DrawTextStyle | ((scores: Stats) => Promise<DrawTextStyle>)
 }
+
 export type PDF = {
   filename: string
+  system: string
+  /* provide one Point to have the same offsets applied to all four cards, more to for specific offsets */
+  offset?: Point[]
+  style?: {font_size?: number}
+  orientation?: 'portrait' | 'landscape'
   fields: {
     [key: string]: Location
   }
+}
+
+export type Point = {
+  x: number,
+  y: number
 }

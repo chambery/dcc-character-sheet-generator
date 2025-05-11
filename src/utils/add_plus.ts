@@ -1,1 +1,0 @@
-export default (val: number) => (val > 0 ? '+' : '') + val
