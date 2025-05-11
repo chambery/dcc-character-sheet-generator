@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { degrees, PDFDocument, rgb } from 'pdf-lib'
 import { DrawTextStyle } from './types'
+import curve_text from './utils/curve_text'
 
 const process_pdf = async (file?: File, sheets: { x: number, y: number, text: string, style?: DrawTextStyle }[][] = [], page_style: { font_size?: number } = { font_size: 12 }) => {
   // consol.og('processing pdf')
@@ -36,17 +37,17 @@ const process_pdf = async (file?: File, sheets: { x: number, y: number, text: st
 
 
 
-  // 2. Register fontkit
-  pdfDoc.registerFontkit(fontkit);
+    // 2. Register fontkit
+    pdfDoc.registerFontkit(fontkit)
 
-  // 3. Read the font file
+    // 3. Read the font file
 
-  /* have to download from Google Github font repo  */
-  const fontPath = path.join(__dirname, '../assets/ReenieBeanie.ttf'); // Replace with the actual path
-  const fontBytes = fs.readFileSync(fontPath);
+    /* have to download from Google Github font repo  */
+    const fontPath = path.join(__dirname, '../assets/ReenieBeanie.ttf') // Replace with the actual path
+    const fontBytes = fs.readFileSync(fontPath)
 
-  // 4. Embed the custom font
-  const font = await pdfDoc.embedFont(fontBytes, { subset: true });
+    // 4. Embed the custom font
+    const font = await pdfDoc.embedFont(fontBytes, { subset: true })
 
     // Embed a font (optional, but good practice)
     // const font = await pdfDoc.embedFont(StandardFonts.TimesRoman)
@@ -57,17 +58,29 @@ const process_pdf = async (file?: File, sheets: { x: number, y: number, text: st
 
       sheet.forEach(({ text, x, y, style }) => {
         // console.log('position ', x + x_offset, y + y_offset, text, style)
-
-        page.drawText(text, {
-          x: x,
-          y: y,
-          font: font,
-          size: style?.size ?? page_style.font_size,
-          color: style?.color ?? rgb(0, 0, 0),
-          maxWidth: style?.maxWidth,
-          lineHeight: style?.lineHeight,
-          rotate: style?.rotate
-        })
+        if (style?.curve) {
+          curve_text(page, text,
+            {
+              font,
+              fontSize: (style?.size ?? page_style.font_size ?? 12),
+              startX: x,
+              startY: y,
+              boxWidth: 10,
+              lineHeight: 10,
+              curveParams: { a: .5 }
+            })
+        } else {
+          page.drawText(text, {
+            x: x,
+            y: y,
+            font: font,
+            size: style?.size ?? page_style.font_size,
+            color: style?.color ?? rgb(0, 0, 0),
+            maxWidth: style?.maxWidth,
+            lineHeight: style?.lineHeight,
+            rotate: style?.rotate
+          })
+        }
       })
     })
     // Save the modified PDF

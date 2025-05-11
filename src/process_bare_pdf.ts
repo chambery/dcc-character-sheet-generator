@@ -3,7 +3,7 @@ import { DrawTextStyle } from './types'
 
 
 const process_bare_pdf = async (file: File, sheets: { x: number, y: number, text: string, style?: DrawTextStyle }[][] = [], font_size: number = 4) => {
-  // consol.og('processing pdf')
+  console.log('processing pdf', file.name)
   if (sheets.length === 0) {
     console.log('Please add some text positions first.')
     return
@@ -14,7 +14,7 @@ const process_bare_pdf = async (file: File, sheets: { x: number, y: number, text
   try {
     // Read the selected file as an ArrayBuffer
     const arrayBuffer = await file.arrayBuffer()
-
+    console.log('loaded file ')
     // Load the PDF document
     // const pdfDoc = await PDFDocument.create()
     const pdfDoc = await PDFDocument.load(arrayBuffer)
@@ -22,7 +22,7 @@ const process_bare_pdf = async (file: File, sheets: { x: number, y: number, text
     // const page = pdfDoc.addPage()
     const pages = pdfDoc.getPages()
     if (pages.length === 0) {
-      // consol.og('PDF has no pages.')
+      console.log('PDF has no pages.')
       return
     }
     const page = pages[0]
@@ -31,6 +31,8 @@ const process_bare_pdf = async (file: File, sheets: { x: number, y: number, text
 
     // Embed a font (optional, but good practice)
     const font = await pdfDoc.embedFont(StandardFonts.TimesRoman)
+
+    console.log('sheets', sheets)
 
     // Add text at specified positions
     sheets.forEach((sheet, i: number) => {

@@ -1,8 +1,8 @@
 import { D100, D20, D6, roll } from '@randsum/dice'
 import path from 'path'
 import { RGB } from 'pdf-lib'
-import process_pdf from './process_pdf'
 import { PDF, Point } from './types'
+import process_pdf from './process_pdf'
 
 
 declare global {
@@ -32,13 +32,13 @@ const generate = async ([sheetname, level = '1']: string[]) => {
       { x: sheet.offset[0].x, y: 0 },
       { x: sheet.offset[0].x, y: sheet.offset[0].y }
     ]
-  } else {
-    console.log('Multiple offsets detected, using provided offsets.')
+  } else { 
+    console.log('Multiple/no offsets detected, using provided offsets.')
   }
 
   (sheet.offset = sheet.offset ?? []).push({ x: 0, y: 0 })
 
-  // console.log('sheet.offset(s)', sheet.offset)
+  console.log('sheet.offset(s)', sheet.offset)
 
   const sheets = await Promise.all(sheet.offset.map(async (point: Point) => {
     const scores = roll_dice(Number(level) + 1)
@@ -49,7 +49,7 @@ const generate = async ([sheetname, level = '1']: string[]) => {
       // consol.og(key, value)
       if (value == undefined) return
       texts.push(
-        {
+        { 
           x: (typeof field.x === 'function' ? await field.x(scores) : field.x + (value.length == 1 ? 2 : 0)) + point.x,
           y: (typeof field.y === 'function' ? await field.y(scores) : field.y) + point.y,
           text: value,
