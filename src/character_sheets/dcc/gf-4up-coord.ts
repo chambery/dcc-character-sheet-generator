@@ -1,6 +1,6 @@
 
 export default {
-  filename: 'DCC_L0_4up_jars.pdf',
+  filename: 'DCC_L0_4up_blacksmith.pdf',
   system: 'dcc',
   orientation: 'landscape',
   style: { font_size: 12 },

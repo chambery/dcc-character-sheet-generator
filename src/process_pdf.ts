@@ -17,7 +17,7 @@ const process_pdf = async (file?: File, sheets: { x: number, y: number, text: st
     return
   }
 
-  // consol.og('Processing PDF...')
+  // console.log('Processing PDF...')
 
   try {
     // Read the selected file as an ArrayBuffer
@@ -54,21 +54,14 @@ const process_pdf = async (file?: File, sheets: { x: number, y: number, text: st
 
     // Add text at specified positions
     sheets.forEach((sheet) => { // , i: number
-      // console.log('sheet', i, sheet)
+      // console.log('sheet', sheet)
 
       sheet.forEach(({ text, x, y, style }) => {
         // console.log('position ', x + x_offset, y + y_offset, text, style)
         if (style?.curve) {
-          curve_text(page, text,
-            {
-              font,
-              fontSize: (style?.size ?? page_style.font_size ?? 12),
-              startX: x,
-              startY: y,
-              boxWidth: 10,
-              lineHeight: 10,
-              curveParams: { a: .5 }
-            })
+          // console.log('÷÷÷ about to curve_text()', style.curve.curvature )
+
+          curve_text(page, text, font, (style?.size ?? page_style.font_size ?? 12), { x, y }, { x: style.curve.end.x, y: style.curve.end.y }, style.curve.curvature)
         } else {
           page.drawText(text, {
             x: x,
@@ -114,5 +107,7 @@ const process_pdf = async (file?: File, sheets: { x: number, y: number, text: st
     // consol.og(`Error processing PDF: ${error instanceof Error ? error.message : 'An unknown error occurred'}`)
   }
 }
+
+
 
 export default process_pdf

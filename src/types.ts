@@ -17,7 +17,10 @@ export type DrawTextStyle = {
   maxWidth?: number,
   lineHeight?: number,
   rotate?: Degrees,
-  curve?: boolean,
+  curve?: {
+    end: { x: number, y: number },
+    curvature?: number
+  },
 }
 
 export type Location = {
