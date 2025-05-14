@@ -57,7 +57,7 @@ export default {
       style: async () => ({ size: 14 })
     },
 
-    ac: { x: 153, y: 195, calc: async (scores: Stats) => 10 + ability_modifier(scores['agl']), style: { size: 26 } },
+    ac: { x: 160, y: 205, calc: async (scores: Stats) => 10 + ability_modifier(scores['agl']), style: { size: 20 } },
 
     speed: {
       x: 74, y: 111, calc: async (scores: Stats) => {
