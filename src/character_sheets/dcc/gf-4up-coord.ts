@@ -1,6 +1,6 @@
 
 export default {
-  filename: 'DCC_L0_4up_blacksmith.pdf',
+  filename: 'DCC_L0_4up_dashboard.pdf',
   system: 'dcc',
   orientation: 'landscape',
   style: { font_size: 12 },

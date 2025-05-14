@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standalone PDF Location Marker</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            gap: 20px;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        h1 {
+            color: #1a73e8;
+        }
+        input[type="file"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: #1a73e8;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover:not(:disabled) {
+            background-color: #155ab6;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #pdf-viewer-container {
+            border: 1px solid #ccc;
+            width: fit-content; /* Adjusts to PDF page width or canvas width */
+            position: relative; /* For absolute positioning of markers */
+            cursor: crosshair;
+            background-color: #fff; /* Background for the container */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        #pdf-canvas {
+            display: block; /* Remove extra space below canvas */
+        }
+        .location-marker {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            transform: translate(-50%, -50%); /* Centers the dot on the click */
+            pointer-events: none; /* Makes markers non-interactive with mouse */
+        }
+        #locations-list-container {
+            width: 80%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+        #locations-list-container ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #locations-list-container li {
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .loading-message, .error-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .loading-message {
+            background-color: #e0e0e0;
+        }
+        .error-message {
+            background-color: #ffdddd;
+            color: #d8000c;
+        }
+        /* Styles for PDF.js text layer (optional, but good for text selection) */
+        .textLayer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            opacity: 0.2; /* Make text layer visible for debugging, set to 0 for production if needed */
+            line-height: 1.0;
+        }
+        .textLayer > span {
+            color: transparent;
+            position: absolute;
+            white-space: pre;
+            cursor: text;
+            transform-origin: 0% 0%;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Configure PDF.js worker
+        // Note: pdf.worker.min.js is loaded globally from CDN in this example
+        // For local files, you might need:
+        // pdfjsLib.GlobalWorkerOptions.workerSrc = './path/to/pdf.worker.min.js';
+        // Since we load it via CDN, it should be globally available.
+        // If issues arise, ensure the path is correct or it's found by pdf.js
+
+        const App = () => {
+            const [pdfFile, setPdfFile] = React.useState(null);
+            const [locations, setLocations] = React.useState([]);
+            const [pdfDoc, setPdfDoc] = React.useState(null); // Stores the PDFDocumentProxy object
+            const [isLoading, setIsLoading] = React.useState(false);
+            const [pdfError, setPdfError] = React.useState(null);
+            const canvasRef = React.useRef(null);
+            const textLayerRef = React.useRef(null); // For the text layer
+
+            const handleFileChange = async (event) => {
+                const file = event.target.files?.[0];
+                setPdfError(null);
+                setPdfDoc(null); // Clear previous document
+                setLocations([]); // Reset locations
+
+                if (file && file.type === "application/pdf") {
+                    setPdfFile(file);
+                    setIsLoading(true);
+                    try {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                        const pdf = await loadingTask.promise;
+                        setPdfDoc(pdf);
+                        if (pdf.numPages > 1) {
+                            alert("This is a multi-page PDF. Only the first page will be displayed and interactive.");
+                        }
+                    } catch (error) {
+                        console.error("Error loading PDF:", error);
+                        setPdfError(`Failed to load PDF: ${error.message}`);
+                        setPdfFile(null); // Clear invalid file
+                    } finally {
+                        setIsLoading(false);
+                    }
+                } else {
+                    alert("Please select a valid PDF file.");
+                    setPdfFile(null);
+                }
+            };
+
+            React.useEffect(() => {
+                if (!pdfDoc || !canvasRef.current) {
+                    // Clear canvas if no doc
+                    if (canvasRef.current) {
+                        const canvas = canvasRef.current;
+                        const context = canvas.getContext('2d');
+                        context.clearRect(0, 0, canvas.width, canvas.height);
+                    }
+                    // Clear text layer
+                    if (textLayerRef.current) {
+                        textLayerRef.current.innerHTML = '';
+                    }
+                    return;
+                }
+
+                const renderPage = async () => {
+                    setIsLoading(true);
+                    setPdfError(null);
+                    try {
+                        const page = await pdfDoc.getPage(1); // Always page 1
+                        const viewport = page.getViewport({ scale: 1.5 }); // Adjust scale as needed
+                        
+                        const canvas = canvasRef.current;
+                        const context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+
+                        const renderContext = {
+                            canvasContext: context,
+                            viewport: viewport,
+                        };
+                        await page.render(renderContext).promise;
+
+                        // Render text layer (optional, for text selection/accessibility)
+                        if (textLayerRef.current) {
+                            textLayerRef.current.innerHTML = ''; // Clear previous text layer
+                            textLayerRef.current.style.width = `${canvas.width}px`;
+                            textLayerRef.current.style.height = `${canvas.height}px`;
+
+                            const textContent = await page.getTextContent();
+                            pdfjsLib.renderTextLayer({
+                                textContent: textContent,
+                                container: textLayerRef.current,
+                                viewport: viewport,
+                                textDivs: []
+                            });
+                        }
+
+                    } catch (error) {
+                        console.error("Error rendering page:", error);
+                        setPdfError(`Failed to render PDF page: ${error.message}`);
+                    } finally {
+                        setIsLoading(false);
+                    }
+                };
+
+                renderPage();
+            }, [pdfDoc]); // Rerender when pdfDoc changes
+
+            const handleCanvasClick = (event) => {
+                if (!canvasRef.current || !pdfDoc) return;
+
+                const canvas = canvasRef.current;
+                const rect = canvas.getBoundingClientRect(); // Get canvas position relative to viewport
+                
+                // Calculate click coordinates relative to the canvas
+                // event.clientX/Y are viewport-relative
+                // rect.left/top are canvas's top-left corner viewport-relative
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+
+                const name = window.prompt(
+                    `Enter name for location on Page 1 at (x: ${Math.round(x)}, y: ${Math.round(y)}):`
+                );
+
+                if (name) {
+                    setLocations(prevLocations => [
+                        ...prevLocations,
+                        { name, page: 1, x: parseFloat(x.toFixed(2)), y: parseFloat(y.toFixed(2)) }
+                    ]);
+                }
+            };
+            
+            const handleViewerKeyDown = (event) => {
+                if ((event.key === 'Enter' || event.key === ' ') && canvasRef.current && pdfDoc) {
+                    event.preventDefault(); // Prevent page scroll if space is pressed
+                    const canvas = canvasRef.current;
+                    const rect = canvas.getBoundingClientRect();
+                    // For keyboard, use the center of the visible PDF area as a fallback.
+                     const mockMouseEvent = { // Simulate parts of a MouseEvent
+                        clientX: rect.left + rect.width / 2,
+                        clientY: rect.top + rect.height / 2,
+                    };
+                    handleCanvasClick(mockMouseEvent);
+                }
+            };
+
+
+            return (
+                <React.Fragment>
+                    <h1>PDF Location Marker (Standalone HTML)</h1>
+                    <input type="file" accept=".pdf" onChange={handleFileChange} disabled={isLoading} />
+
+                    {isLoading && <div className="loading-message">Loading PDF...</div>}
+                    {pdfError && <div className="error-message">{pdfError}</div>}
+
+                    {pdfFile && !pdfError && (
+                        <div 
+                            id="pdf-viewer-container"
+                            onClick={handleCanvasClick}
+                            onKeyDown={handleViewerKeyDown}
+                            role="button"
+                            tabIndex={0} // Make it focusable
+                            aria-label="PDF page container (Page 1), click or press Enter/Space to mark location"
+                        >
+                            <canvas ref={canvasRef} id="pdf-canvas"></canvas>
+                            {/* Text Layer Div (positioned over the canvas) */}
+                            <div ref={textLayerRef} className="textLayer"></div>
+
+                            {/* Display markers */}
+                            {locations.map((loc, index) => (
+                                <div
+                                    key={index}
+                                    className="location-marker"
+                                    title={`${loc.name} (X: ${loc.x}, Y: ${loc.y})`}
+                                    style={{
+                                        left: `${loc.x}px`,
+                                        top: `${loc.y}px`,
+                                    }}
+                                    aria-hidden="true"
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {locations.length > 0 && (
+                        <div id="locations-list-container">
+                            <h2>Marked Locations (Page 1):</h2>
+                            <ul>
+                                {locations.map((loc, index) => (
+                                    <li key={index}>
+                                        <strong>{loc.name}</strong> - X: {loc.x}, Y: {loc.y}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </React.Fragment>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

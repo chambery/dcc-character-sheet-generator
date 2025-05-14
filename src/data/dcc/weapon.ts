@@ -10,12 +10,14 @@ const weapon = (scores: Stats) => {
   const as_weapon = weapon_line?.[2]
   const weapon_name = weapon_line?.[1] ?? weapon_line?.[3] + ' ' +  (weapon_line?.[4] ? weapon_line?.[4] : '')
 
-  const damage = weapons.find((w) =>
+  const stats = weapons.find((w) =>
     (as_weapon && as_weapon.toLowerCase() == w.name.toLowerCase().substring(0, as_weapon.length))
     || weapon_name?.toLowerCase() == w.name.toLowerCase().substring(0, weapon_name?.length)
-  )?.damage
-
-  return weapon_name + ' ' + (damage ?? '1d4')
+  )
+  const damage = stats?.damage ?? '1d4'
+  const range = stats?.range == undefined || stats?.range === '-' ? undefined : stats?.range
+  
+  return { name: weapon_name, damage, range }
 }
 
 

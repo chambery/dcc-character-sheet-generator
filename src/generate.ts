@@ -1,8 +1,8 @@
 import { D100, D20, D6, roll } from '@randsum/dice'
 import path from 'path'
 import { RGB } from 'pdf-lib'
-import process_pdf from './process_pdf'
 import { DrawTextStyle, PDF, Point } from './types'
+import process_pdf from './process_pdf'
 
 
 declare global {
