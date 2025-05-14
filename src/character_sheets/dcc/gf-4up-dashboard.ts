@@ -53,9 +53,13 @@ export default {
     //   style: { size: 12 }
     // },
     melee_adj: { x: 340, y: 185, calc: (scores: Stats) => decorate(ability_modifier(scores['str']), ['+']), style: { size: 16 } },
-    melee_damage: { x: 360, y: 185, calc: (scores: Stats) => weapon(scores).range ? '' : weapon(scores).damage },
+    melee_damage: { x: 360, y: 185, calc: (scores: Stats) => weapon(scores).range ? '' : weapon(scores).damage, 
+      style: (scores: Stats) =>  shrink_text(weapon(scores).range ? '' : weapon(scores).damage, 4, 7)
+     },
     range_adj: { x: 340, y: 142, calc: (scores: Stats) => decorate(ability_modifier(scores['agl']), ['+']), style: { size: 16 } },
-    range_damage: { x: 360, y: 142, calc: (scores: Stats) => weapon(scores).range ? weapon(scores).damage : '' },
+    range_damage: { x: 360, y: 142, calc: (scores: Stats) => weapon(scores).range ? weapon(scores).damage : '',
+      style: (scores: Stats) =>  shrink_text(weapon(scores).range ? weapon(scores).damage : '' , 4, 7)
+     },
     equipment: { x: 215, y: 96, calc: async (scores: Stats) => await equipment(scores), style: { size: 14 } },
     weapon: {
       x: 205, y: 81, calc: (scores: Stats) => weapon(scores).name + ' ' + (weapon(scores).range ?? ''),
