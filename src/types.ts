@@ -16,8 +16,12 @@ export type DrawTextStyle = {
   color?: RGB,
   maxWidth?: number,
   lineHeight?: number,
-  rotate?: Degrees
-  }
+  rotate?: Degrees,
+  curve?: {
+    end: { x: number, y: number },
+    curvature?: number
+  },
+}
 
 export type Location = {
   x: number | ((scores: Stats) => Promise<number>),
@@ -31,7 +35,7 @@ export type PDF = {
   system: string
   /* provide one Point to have the same offsets applied to all four cards, more to for specific offsets */
   offset?: Point[]
-  style?: {font_size?: number}
+  style?: { font_size?: number }
   orientation?: 'portrait' | 'landscape'
   fields: {
     [key: string]: Location
