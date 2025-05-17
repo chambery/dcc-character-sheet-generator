@@ -46,7 +46,9 @@ const generate = async ([sheetname, level = '1']: string[]) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     await Promise.all(Object.entries(sheet.fields).map(async ([key, field]) => {
       const value = String(await field.calc(scores))
-      // consol.og(key, value)
+      if (key == 'melee_dmg') {
+        console.log('print value', key, value)
+      }
       if (value == undefined) return
       const offsetStyle = offset_style(offset, (typeof field.style === 'function') ? await field.style(scores) : field.style)
       // if (offsetStyle.curve) console.log('\n\noffsetStyle curvature', offsetStyle.curve.curvature, '\n=======\n')
@@ -59,7 +61,7 @@ const generate = async ([sheetname, level = '1']: string[]) => {
         })
     }))
     return texts
-  })) 
+  }))
 
   // console.log('sheets', sheets)
   const filepath = await process_pdf(file, sheets, sheet.style)

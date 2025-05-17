@@ -1,3 +1,4 @@
+import { degrees } from "pdf-lib"
 import { EXCLUDE_DESCRIPTION } from "../../constants"
 import equipment from "../../data/dcc/equipment"
 import weapon from "../../data/dcc/weapon"
@@ -35,10 +36,10 @@ export default {
     will: { x: 43, y: 73, calc: (scores: Stats) => decorate(ability_modifier(scores['per']), ['+']), style: { size: 18 } },
     hp: { x: 162, y: 186, calc: (scores: Stats) => hp(scores, '1d4'), style: { size: 24 } },
     // init: { x: 350, y: 215, calc: (scores: Stats) => decorate(ability_modifier(scores['agl']), ['+']), style: { size: 18 } },
-    init: { x: 345, y: 240, calc: (scores: Stats) => decorate(ability_modifier(scores['agl']), ['+']), },
+    init: { x: 345, y: 240, calc: (scores: Stats) => decorate(ability_modifier(scores['agl']), ['+']), style: { size: 22 } },
     birth_augur: {
       x: 171, y: 214, calc: async (scores: Stats) => await birth_augur(scores, EXCLUDE_DESCRIPTION),
-      style: { size: 7, maxWidth: 40, lineHeight: 8 }, //  , maxWidth: 40, lineHeight: 10
+      style: { size: 7, maxWidth: 100, lineHeight: 8 }, //  , maxWidth: 40, lineHeight: 10
 
     },
     occupation: {
@@ -53,24 +54,24 @@ export default {
     // },
     melee_adj: { x: 349, y: 170, calc: (scores: Stats) => decorate(ability_modifier(scores['str']), ['+']), style: { size: 16 } },
     melee_dmg: {
-      x: 352, y: 152, calc: (scores: Stats) => weapon(scores).range ? '' : weapon(scores).damage,
-      style: (scores: Stats) => shrink_text(weapon(scores).range ? '' : weapon(scores).damage, 4, 7)
+      x: (scores: Stats) => weapon(scores).melee_dmg.length > 4 ? 347 : 352,
+      y: 152,
+      calc: (scores: Stats) => { console.log('¡¡¡melee_dmg', weapon(scores).melee_dmg); return String(weapon(scores).melee_dmg) },
+      style: (scores: Stats) => ({ ...shrink_text(weapon(scores).melee_dmg, 4, 7), rotate: degrees(weapon(scores).melee_dmg.length > 4 ? 15 : 0) })
     },
     range_adj: { x: 357, y: 128, calc: (scores: Stats) => decorate(ability_modifier(scores['agl']), ['+']), style: { size: 16 } },
-    range_dmg: {
-      x: 345, y: 112, calc: (scores: Stats) => weapon(scores).range ? weapon(scores).damage : '',
-      style: (scores: Stats) => shrink_text(weapon(scores).range ? weapon(scores).damage : '', 4, 7)
-    },
-    eequipment: { x: 244, y: 200, calc: async (scores: Stats) => await equipment(scores) },
+    range_dmg: { x: 345, y: 112, calc: (scores: Stats) => weapon(scores).ranged_dmg },
+
+    equipment: { x: 244, y: 200, calc: async (scores: Stats) => await equipment(scores) },
     // equipment: { x: 215, y: 96, calc: async (scores: Stats) => await equipment(scores), style: { size: 14 } },
     weapon: {
       x: 107, y: 146, calc: (scores: Stats) => weapon(scores).name + ' ' + (weapon(scores).range ?? ''),
-      style: { size: 12 }
+      style: (scores: Stats) => shrink_text(weapon(scores).name + ' ' + (weapon(scores).range ?? ''), 11, 9)
     },
-    ac: { x: 307, y: 224, calc: (scores: Stats) => 10 + ability_modifier(scores['agl']), style: { size: 20 } },
+    ac: { x: 307, y: 224, calc: (scores: Stats) => 10 + ability_modifier(scores['agl']), style: { size: 24 } },
     // ac: { x: 297, y: 155, calc: async (scores: Stats) => 10 + ability_modifier(scores['agl']), style: { size: 20 } },
 
-    sspeed: {
+    speed: {
       x: 64, y: 54, calc: async (scores: Stats) => {
         const occ = await occupation(scores)
         return (occ.includes('warf') || occ.includes('alfing')) ? "20'" : "30'"
@@ -87,4 +88,7 @@ export default {
   }
 }
 
-const shrink_text = (text: string, threshold: number, size: number) => text.length > threshold ? { size } : {}
+const shrink_text = (text: string, threshold: number, size: number) => {
+  console.log('shrink_text', text, threshold, size)
+  return text.length > threshold ? { size } : {}
+}

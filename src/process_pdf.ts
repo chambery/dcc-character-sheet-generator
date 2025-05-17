@@ -57,12 +57,19 @@ const process_pdf = async (file?: File, sheets: { x: number, y: number, text: st
       // console.log('sheet', sheet)
 
       sheet.forEach(({ text, x, y, style }) => {
-        // console.log('position ', x + x_offset, y + y_offset, text, style)
+        if (text.startsWith('1d4/')) {
+          console.log('printing melee_dmg', text)
+
+        }
         if (style?.curve) {
           // console.log('÷÷÷ about to curve_text()', style.curve.curvature )
 
           curve_text(page, text, font, (style?.size ?? page_style.font_size ?? 12), { x, y }, { x: style.curve.end.x, y: style.curve.end.y }, style.curve.curvature)
         } else {
+          if (text.startsWith('1d4/')) {
+            console.log('printing melee_dmg', text)
+
+          }
           page.drawText(text, {
             x: x,
             y: y,
