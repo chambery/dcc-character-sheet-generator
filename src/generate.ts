@@ -1,8 +1,8 @@
 import { D100, D20, D6, roll } from '@randsum/dice'
 import path from 'path'
 import { RGB } from 'pdf-lib'
-import { DrawTextStyle, PDF, Point } from './types'
 import process_pdf from './process_pdf'
+import { DrawTextStyle, PDF, Point } from './types'
 
 
 declare global {
@@ -59,7 +59,7 @@ const generate = async ([sheetname, level = '1']: string[]) => {
         })
     }))
     return texts
-  }))
+  })) 
 
   // console.log('sheets', sheets)
   const filepath = await process_pdf(file, sheets, sheet.style)
