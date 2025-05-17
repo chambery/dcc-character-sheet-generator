@@ -11,6 +11,7 @@ const weapon = (scores: Stats) => {
   const as_weapon = weapon_line?.[2]
   const weapon_name = weapon_line?.[1] ?? weapon_line?.[3] + (weapon_line?.[4] ? ' ' + weapon_line?.[4] : '')
 
+  /* no match (eg. "Hammer, fine") has default melee damage */
   const stats = _.find(weapons, (w) => {
     // console.log('\t\t', w.name, as_weapon, weapon_name)
     // console.log('\t\t\t', '"' + as_weapon?.toLowerCase() + '"', ' == ', '"' + w.name.toLowerCase().substring(0, as_weapon?.length) + '"', (as_weapon?.toLowerCase() == w.name.toLowerCase().substring(0, as_weapon?.length)))
@@ -18,7 +19,7 @@ const weapon = (scores: Stats) => {
     // console.log('\t\t\t\t', 'match?', (as_weapon?.toLowerCase() == w.name.toLowerCase().substring(0, as_weapon?.length)) || weapon_name?.toLowerCase() == w.name.toLowerCase().substring(0, weapon_name?.length))
     return (as_weapon?.toLowerCase() == w.name.toLowerCase().substring(0, as_weapon?.length))
       || weapon_name?.toLowerCase() == w.name.toLowerCase().substring(0, weapon_name?.length)
-  })
+  }) ?? { name: weapon_name, damage: '1d4', range: undefined,  }
   // const stats = _.find(weapons, (w) => as_weapon?.toLowerCase() == w.name.toLowerCase().substring(0, as_weapon?.length))
 
   const damage_separator = stats?.damage.indexOf('/')
@@ -31,13 +32,13 @@ const weapon = (scores: Stats) => {
     (backstab && backstab > -1) ?
       stats?.damage.substring(0, damage_separator)
       : stats?.damage
-    : ''
-  if (backstab && backstab > -1) {
-    console.log(backstab, stats?.damage)
-  }
-  const melee_dmg = (ranged_only && ranged_only > -1) ? '' : stats?.damage 
+    : undefined
+  // if (backstab && backstab > -1) {
+    // console.log(backstab, stats?.damage)
+  // }
+  const melee_dmg = (ranged_only && ranged_only > -1) ? undefined : stats?.damage 
   // console.log('melee_dmg', melee_dmg)
-  return { name: weapon_name, ranged_dmg: ranged_dmg ?? '', melee_dmg: melee_dmg ?? '', range: range }
+  return { name: weapon_name, ranged_dmg: ranged_dmg, melee_dmg: melee_dmg, range: range }
 }
 
 

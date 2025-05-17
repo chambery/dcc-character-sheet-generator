@@ -41,6 +41,7 @@ export default {
     },
     occupation: { x: 165, y: 260, calc: async (scores: Stats) => await occupation(scores) },
     weapon: {
+      // TODO - fix up to new weapon API
       x: 185, y: 186, calc: (scores: Stats) => weapon(scores),
       style: { size: 12 }
     },

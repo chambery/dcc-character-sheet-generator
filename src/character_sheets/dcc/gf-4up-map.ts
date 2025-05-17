@@ -8,6 +8,7 @@ import decorate from "../../utils/decorate"
 import hp from "../../utils/hp"
 import ability_modifier from "../../utils/modifier"
 import occupation from "../../utils/occupation"
+import shrink_text from "../../utils/shrink_text"
 
 export default {
   filename: 'DCC_L0_4up_map.pdf',
@@ -66,5 +67,3 @@ export default {
     // },
   }
 }
-
-const shrink_text = (text: string, threshold: number, size: number) => text.length > threshold ? { size } : {}

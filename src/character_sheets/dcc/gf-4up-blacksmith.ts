@@ -49,7 +49,7 @@ export default {
 
     },
     weapon: {
-      x: 147, y: 155, calc: (scores: Stats) => `${weapon(scores).name} (${weapon(scores).damage}) ${weapon(scores).range ? `(${weapon(scores).range})` : ''}`,
+      x: 147, y: 155, calc: (scores: Stats) => `${weapon(scores).name} (${weapon(scores).melee_dmg ?? weapon(scores).ranged_dmg}) ${weapon(scores).range ? `(${weapon(scores).range})` : ''}`,
       style: { size: 12 }
     },
     equipment: {

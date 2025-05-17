@@ -75,5 +75,3 @@ export default {
     // },
   }
 }
-
-const shrink_text = (text: string, threshold: number, size: number) => text.length > threshold ? { size } : {}
