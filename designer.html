@@ -10,6 +10,7 @@
   <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
 
   <style>
     body {
@@ -100,14 +101,6 @@
       padding: 0;
     }
 
-    #locations-list-container li {
-      border: 1px solid #eee;
-      padding: 10px;
-      margin-bottom: 8px;
-      border-radius: 4px;
-      background-color: #f9f9f9;
-    }
-
     .loading-message,
     .error-message {
       padding: 10px;
@@ -132,6 +125,7 @@
       bottom: 0;
       overflow: hidden;
       opacity: 0.2;
+      /* Optional: makes text selectable but not too obtrusive */
       line-height: 1.0;
     }
 
@@ -147,9 +141,8 @@
 
 <body>
   <div id="root"></div>
-
   <script type="text/babel">
-    // Configure PDF.js worker (loaded globally from CDN)
+    const RENDER_SCALE = 1.5
 
     const App = () => {
       const [pdfFile, setPdfFile] = React.useState(null)
@@ -158,13 +151,45 @@
       const [isLoading, setIsLoading] = React.useState(false)
       const [pdfError, setPdfError] = React.useState(null)
       const [isLandscape, setIsLandscape] = React.useState(false) // New state for orientation
+      const [copyButtonText, setCopyButtonText] = React.useState({})
       const canvasRef = React.useRef(null)
-      const textLayerRef = React.useRef(null)
+      const [copyAllButtonText, setCopyAllButtonText] = React.useState('Copy All Locations')
+      const textLayerRef = React.useRef(null) // For pdf.js text layer
+      const [pdfJsDoc, setPdfJsDoc] = React.useState(null) // For pdf.js document
+
+      React.useEffect(() => {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js'
+      }, [])
+
+      React.useEffect(() => {
+        const loadInitialPdf = async () => {
+          const filePath = '/Users/chambery/projects/dcc-character-sheet-generator/assets/DCC_L0_4up_tree.pdf'
+          try {
+            // For local file URLs, fetch might be restricted by browser security policies (CORS).
+            // This approach works best if the HTML is served from a local server or if browser settings allow it.
+            // If running directly from the filesystem (file:// protocol), this fetch will likely fail.
+            // In such a case, the user would still need to use the file input.
+            // This fetch part is independent of the PDF library used.
+            const response = await fetch(filePath)
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status} for ${filePath}`)
+            }
+            const blob = await response.blob()
+            const file = new File([blob], "DCC_L0_4up_tree.pdf", { type: "application/pdf" })
+            handleFileChange({ target: { files: [file] } })
+          } catch (error) {
+            console.warn("Could not automatically load initial PDF. Please select it manually.", error)
+            // Optionally, inform the user: setPdfError("Could not auto-load initial PDF: " + error.message);
+          }
+        }
+        loadInitialPdf()
+      }, [])
 
       const handleFileChange = async (event) => {
         const file = event.target.files?.[0]
         setPdfError(null)
         setPdfDoc(null)
+        setPdfJsDoc(null)
         setLocations([])
         setIsLandscape(false) // Reset orientation on new file
 
@@ -173,18 +198,30 @@
           setIsLoading(true)
           try {
             const arrayBuffer = await file.arrayBuffer()
-            const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer })
-            const pdf = await loadingTask.promise
-            setPdfDoc(pdf)
-            if (pdf.numPages > 1) {
-              alert("This is a multi-page PDF. Only the first page will be displayed and interactive.")
+
+            // Load with pdf-lib (for metadata, future manipulation)
+            const pdfLibDoc = await PDFLib.PDFDocument.load(arrayBuffer.slice(0)) // Use slice to avoid issues with buffer being transferred
+            setPdfDoc(pdfLibDoc)
+
+            // Load with pdf.js (for rendering)
+            const pdfJsLoadingTask = pdfjsLib.getDocument({ data: arrayBuffer.slice(0) })
+            const pdfjsDocument = await pdfJsLoadingTask.promise
+            setPdfJsDoc(pdfjsDocument)
+
+            if (pdfLibDoc.getPageCount() > 1) {
+              alert(
+                "This is a multi-page PDF. Only the first page will be displayed and interactive."
+              )
+            }
+            if (pdfjsDocument.numPages > 1 && pdfLibDoc.getPageCount() <= 1) { // Should be consistent but good to check
+              alert(
+                "pdf.js reports multiple pages. Only the first page will be displayed and interactive."
+              )
             }
           } catch (error) {
             console.error("Error loading PDF:", error)
             setPdfError(`Failed to load PDF: ${error.message}`)
             setPdfFile(null)
-          } finally {
-            setIsLoading(false)
           }
         } else {
           alert("Please select a valid PDF file.")
@@ -192,8 +229,9 @@
         }
       }
 
+      // Effect for rendering with pdf.js
       React.useEffect(() => {
-        if (!pdfDoc || !canvasRef.current) {
+        if (!pdfJsDoc || !canvasRef.current) {
           if (canvasRef.current) {
             const canvas = canvasRef.current
             const context = canvas.getContext('2d')
@@ -205,12 +243,14 @@
           return
         }
 
-        const renderPage = async () => {
+        const renderPdfPage = async () => {
           setIsLoading(true)
           setPdfError(null)
           try {
-            const page = await pdfDoc.getPage(1)
-            const viewport = page.getViewport({ scale: 1.5 })
+            const pageNumber = 1 // pdf.js is 1-indexed
+            const page = await pdfJsDoc.getPage(pageNumber)
+            const scale = RENDER_SCALE
+            const viewport = page.getViewport({ scale })
 
             const canvas = canvasRef.current
             const context = canvas.getContext('2d')
@@ -223,11 +263,11 @@
             }
             await page.render(renderContext).promise
 
+            // Render text layer for selection (optional)
             if (textLayerRef.current) {
-              textLayerRef.current.innerHTML = ''
+              textLayerRef.current.innerHTML = '' // Clear previous
               textLayerRef.current.style.width = `${canvas.width}px`
               textLayerRef.current.style.height = `${canvas.height}px`
-
               const textContent = await page.getTextContent()
               pdfjsLib.renderTextLayer({
                 textContent: textContent,
@@ -237,30 +277,35 @@
               })
             }
           } catch (error) {
-            console.error("Error rendering page:", error)
+            console.error("Error rendering PDF page with pdf.js:", error)
             setPdfError(`Failed to render PDF page: ${error.message}`)
           } finally {
             setIsLoading(false)
           }
         }
-        renderPage()
-      }, [pdfDoc])
+        renderPdfPage()
+      }, [pdfJsDoc]) // Re-render when pdfJsDoc changes
 
       const handleCanvasClick = (event) => {
         if (!canvasRef.current || !pdfDoc) return
         const canvas = canvasRef.current
         const rect = canvas.getBoundingClientRect()
-        const x = event.clientX - rect.left
-        const y = event.clientY - rect.top
+        const canvasX = event.clientX - rect.left
+        const canvasY = event.clientY - rect.top
+
+        // Convert canvas coordinates to PDF point coordinates
+        const pdfX = canvasX / RENDER_SCALE
+        const pdfY = canvasY / RENDER_SCALE
 
         const name = window.prompt(
-          `Enter name for location on Page 1 at (x: ${Math.round(x)}, y: ${Math.round(y)}):`
+          `Enter name for location on Page 1 at PDF coordinates (x: ${Math.round(pdfX)}, y: ${Math.round(pdfY)}):`
         )
 
         if (name) {
           setLocations(prevLocations => [
             ...prevLocations,
-            { name, page: 1, x: parseFloat(x.toFixed(2)), y: parseFloat(y.toFixed(2)) }
+            // Store PDF point coordinates
+            { name, page: 1, x: parseFloat(pdfX.toFixed(2)), y: parseFloat(pdfY.toFixed(2)) }
           ])
         }
       }
@@ -278,6 +323,44 @@
         }
       }
 
+      const handleCopyAllLocations = () => {
+        if (!pdfDoc || locations.length === 0) return
+
+        let allCodeTextOutput = ""
+        locations.forEach((loc, index) => {
+          const { x: markerDisplayXOnCanvas, y: markerDisplayYOnCanvas } = getDisplayCoordinates(loc)
+
+          let outputCodeX = Math.round(loc.x)
+          // The 'actually' variable calculation for Y seems to be the one used in the final codeText
+          // It's derived from the visual marker's Y position, then adjusted.
+          const actually = (918 - markerDisplayYOnCanvas) / RENDER_SCALE
+          let outputCodeY = Math.round(actually)
+
+          if (isLandscape && pdfDoc) {
+            const pdfLibPage = pdfDoc.getPage(0)
+            const originalPdfWidth = pdfLibPage.getSize().width
+            // For landscape, X in codeText comes from loc.y (PDF point)
+            outputCodeX = Math.round(loc.y)
+            // The Y ('actually') is already calculated based on markerDisplayYOnCanvas,
+            // and getDisplayCoordinates handles the visual landscape transformation for the marker.
+            // So, 'actually' should correctly reflect the transformed Y perspective.
+          }
+
+          const singleCodeText = `${loc.name}: { x: ${outputCodeX}, y: ${outputCodeY}, calc: async (scores: Stats) =>`
+          allCodeTextOutput += singleCodeText + (index < locations.length - 1 ? "\n" : "")
+        })
+
+        navigator.clipboard.writeText(allCodeTextOutput)
+          .then(() => {
+            setCopyAllButtonText('All Copied!')
+            setTimeout(() => setCopyAllButtonText('Copy All Locations'), 2000)
+          })
+          .catch(err => {
+            console.error('Failed to copy all locations: ', err)
+            alert("Failed to copy all locations. See console for details.")
+          })
+      }
+
       const toggleLandscape = () => {
         setIsLandscape(prev => !prev)
       }
@@ -285,17 +368,33 @@
       // Helper function to get transformed coordinates for display
       const getDisplayCoordinates = (loc) => {
         const canvas = canvasRef.current
-        if (isLandscape && canvas && canvas.width && canvas.height) {
-          // Landscape transformation (simulating 90-deg clockwise content rotation)
-          // new X = old Y
-          // new Y = original_canvas_width - old X
-          return {
-            x: loc.y,
-            y: canvas.width - loc.x
-          }
+        if (!canvas) return { x: 0, y: 0 } // Should not happen if PDF is loaded
+
+        // loc.x and loc.y are PDF points. Scale them up for canvas display.
+        let markerCanvasX = loc.x * RENDER_SCALE
+        let markerCanvasY = loc.y * RENDER_SCALE
+
+        if (isLandscape) {
+          // Landscape transformation for the visual marker on the canvas.
+          // The canvas itself is rendered in portrait orientation by pdf.js.
+          // We are rotating the *point's display* on this portrait canvas.
+          // canvas.width is the scaled width of the portrait PDF page.
+          const tempX = markerCanvasX
+          markerCanvasX = markerCanvasY          // new X is old Y (scaled)
+          markerCanvasY = canvas.width - tempX // new Y is canvas_width - old X (scaled)
         }
-        // Portrait (original) coordinates
-        return { x: loc.x, y: loc.y }
+        return { x: markerCanvasX, y: markerCanvasY }
+      }
+
+      const handleCopy = (textToCopy, locationName) => {
+        navigator.clipboard.writeText(textToCopy)
+          .then(() => {
+            setCopyButtonText({ ...copyButtonText, [locationName]: 'Copied!' })
+          })
+          .catch(err => {
+            console.error('Failed to copy text: ', err)
+            alert("Failed to copy. See console for details.")
+          })
       }
 
       return (
@@ -303,8 +402,11 @@
           <h1>PDF Location Marker (Standalone HTML)</h1>
           <div className="controls-container">
             <input type="file" accept=".pdf" onChange={handleFileChange} disabled={isLoading} />
-            {pdfDoc && <button onClick={toggleLandscape} disabled={isLoading}>
+            {(pdfDoc || pdfJsDoc) && <button onClick={toggleLandscape} disabled={isLoading}>
               Toggle Landscape/Portrait Coords
+            </button>}
+            {locations.length > 0 && (pdfDoc || pdfJsDoc) && <button onClick={handleCopyAllLocations} disabled={isLoading}>
+              {copyAllButtonText}
             </button>}
           </div>
 
@@ -326,10 +428,10 @@
               {locations.map((loc, index) => {
                 const { x: displayX, y: displayY } = getDisplayCoordinates(loc)
                 return (
-                  <div
+                  <div // This is the visual marker dot
                     key={index}
                     className="location-marker"
-                    title={`${loc.name} (${isLandscape ? 'Landscape' : 'Portrait'} - X: ${Math.round(displayX)}, Y: ${Math.round(displayY)})`}
+                    title={`${loc.name} (Visual Canvas Coords: X: ${Math.round(displayX)}, Y: ${Math.round(displayY)})`}
                     style={{
                       left: `${displayX}px`,
                       top: `${displayY}px`,
@@ -346,10 +448,30 @@
               <h2>Marked Locations (Page 1 - {isLandscape ? 'Landscape Coords' : 'Portrait Coords'}):</h2>
               <ul>
                 {locations.map((loc, index) => {
-                  const { x: displayX, y: displayY } = getDisplayCoordinates(loc)
+                  // displayX, displayY are for the visual marker dot on the canvas for reference in the list
+                  const { x: markerDisplayXOnCanvas, y: markerDisplayYOnCanvas } = getDisplayCoordinates(loc)
+
+                  // For codeText, use PDF points (loc.x, loc.y), transformed if landscape
+                  let codeX = Math.round(loc.x)
+                  let codeY = 918 - Math.round(loc.y)
+
+                  if (isLandscape && pdfDoc) { // pdfDoc is the pdf-lib document
+                    const pdfLibPage = pdfDoc.getPage(0) // pdf-lib is 0-indexed
+                    const originalPdfWidth = pdfLibPage.getSize().width // Unscaled width of the PDF page
+                    // Transform top-left PDF points for a 90-deg clockwise rotation of content
+                    codeX = Math.round(loc.y) // new X is old Y (PDF points)
+                    codeY = Math.round(originalPdfWidth - loc.x) // new Y is original_pdf_width - old X (PDF points)
+                  }
+                  const actually = (918 - markerDisplayYOnCanvas) / RENDER_SCALE
+
+                  // const codeText = `${loc.name}: { x: ${Math.round(codeX - (.038 * codeX))}, y: ${Math.round(actually - (actually * .038))}, calc: (scores: Stats) => `
+                  const codeText = `${loc.name}: { x: ${Math.round(codeX)}, y: ${Math.round(actually)}, calc: (scores: Stats) => `
                   return (
                     <li key={index}>
-                      <strong>{loc.name}</strong> - X: {Math.round(displayX) - 108}, Y: {Math.round(displayY - 339)}
+                      <code>(Visual: {Math.round(markerDisplayXOnCanvas)}, {Math.round(markerDisplayYOnCanvas)}) {codeText}</code>
+                      <button onClick={() => handleCopy(codeText, loc.name)} title="Copy code">
+                        {copyButtonText[loc.name] ?? 'Copy'}
+                      </button>
                     </li>
                   )
                 })}

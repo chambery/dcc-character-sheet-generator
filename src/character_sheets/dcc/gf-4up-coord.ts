@@ -1,6 +1,6 @@
 
 export default {
-  filename: 'DCC_L0_4up_dashboard.pdf',
+  filename: 'DCC_L0_4up_tree.pdf',
   system: 'dcc',
   orientation: 'landscape',
   style: { font_size: 12 },

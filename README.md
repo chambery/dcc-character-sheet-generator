@@ -6,7 +6,10 @@ Currently only supports Mark Anticole's 1st+ level Weird Frontiers character she
 2. Copy your blank sheet to `src/assets`
 3. Create a file in `src/character_sheets` that follows the pattern of one of the existing files
    - set the `filename` attribute to the name of the file you copied to `src/assets`
-5. Run `bun src/main.ts classname`, eg. `bun src/main.ts classname`
+5. Run `bun src/main.ts classname level`, eg. `bun src/main.ts classname 0`
+
+## Designer
+Open the `designer.html` file in your browser to get (close) coordinates on your sheet.  For best results, remember to select the point of the lower left corner of the text to drawn.
 
 
 # Bun + TypeScript

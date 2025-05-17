@@ -1,8 +1,8 @@
 import { D100, D20, D6, roll } from '@randsum/dice'
 import path from 'path'
 import { RGB } from 'pdf-lib'
-import { DrawTextStyle, PDF, Point } from './types'
 import process_pdf from './process_pdf'
+import { DrawTextStyle, PDF, Point } from './types'
 
 
 declare global {
@@ -46,7 +46,6 @@ const generate = async ([sheetname, level = '1']: string[]) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     await Promise.all(Object.entries(sheet.fields).map(async ([key, field]) => {
       const value = String(await field.calc(scores))
-      // consol.og(key, value)
       if (value == undefined) return
       const offsetStyle = offset_style(offset, (typeof field.style === 'function') ? await field.style(scores) : field.style)
       // if (offsetStyle.curve) console.log('\n\noffsetStyle curvature', offsetStyle.curve.curvature, '\n=======\n')
