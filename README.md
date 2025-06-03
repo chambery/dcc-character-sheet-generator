@@ -1,6 +1,7 @@
 A simple app to fill character sheet PDFs with generated valid data.
 
-Currently only supports Mark Anticole's 1st+ level Weird Frontiers character sheets (because [Purple Sorceror pretty much has everything else covered](https://purplesorcerer.com/create_party.php)), but you can fill any PDF:
+~~Currently only~~ Supports Mark Anticole's 1st+ level Weird Frontiers character sheets, plus a bunch of the funnel 4-ups from [Julio's RPG Cove](https://juliosrpgcove.com/resources/#:~:text=CAMPAIGN%20SUPPLEMENTS-,CHARACTER,-SHEETS), ([Purple Sorceror pretty much has everything else covered](https://purplesorcerer.com/create_party.php)) but you can fill any PDF:
+
 
 1. Use the [grid](https://github.com/chambery/dcc-character-sheet-generator/blob/052d387cb07f2af17190e3b889cf1d9234b5651f/src/assets/PDF%20Coordinates.png) as an overlay in a image editor to get field coordinates.  Alternatively, run the generator with 'coords' to generate a "coordinated" pdf.
 2. Copy your blank sheet to `src/assets`
