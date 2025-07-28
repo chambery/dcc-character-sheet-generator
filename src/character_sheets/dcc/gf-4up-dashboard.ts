@@ -12,7 +12,7 @@ import shrink_text from "../../utils/shrink_text"
 export default {
   filename: 'DCC_L0_4up_dashboard.pdf',
   system: 'dcc',
-  orientation: 'landscape',
+  orientation: 'landscape', 
   style: { font_size: 12 },
   /* provide one Point to have the same offsets applied to all four cards, more to for specific offsets */
   offset: [{ x: 374, y: 300 },],
@@ -76,7 +76,8 @@ export default {
       x: 60, y: 87, calc: async (scores: Stats) => {
         const occ = await occupation(scores)
         return (occ.includes('warf') || occ.includes('alfing')) ? "20'" : "30'"
-      }
+      },
+      style: { size: 16 }
     }
     // action_die: {
     //   x: 180, y: 127, calc: async () => 'd20',
