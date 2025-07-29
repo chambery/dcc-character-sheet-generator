@@ -1,13 +1,13 @@
 import { D12 } from "@randsum/dice"
-import weapon from "../../data/weird_frontiers/weapon"
-import { Stats } from "../../types"
-import birth_augur from "../../utils/birth_augur"
-import damage from "../../utils/damage"
-import decorate from "../../utils/decorate"
-import firearm from "../../utils/firearm"
-import hp from "../../utils/hp"
-import ability_modifier from "../../utils/modifier"
-import occupation from "../../utils/occupation"
+import weapon from "../../../data/weird_frontiers/weapon"
+import { Stats } from "../../../types"
+import birth_augur from "../../../utils/birth_augur"
+import damage from "../../../utils/damage"
+import decorate from "../../../utils/decorate"
+import firearm from "../../../utils/firearm"
+import hp from "../../../utils/hp"
+import ability_modifier from "../../../utils/modifier"
+import occupation from "../../../utils/occupation"
 
 export default {
   filename: 'gunslinger_blank_v1.pdf',

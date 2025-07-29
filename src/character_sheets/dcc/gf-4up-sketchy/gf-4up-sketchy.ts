@@ -1,12 +1,12 @@
-import { EXCLUDE_DESCRIPTION } from "../../constants"
-import equipment from "../../data/dcc/equipment"
-import weapon from "../../data/dcc/weapon"
-import { Stats } from "../../types"
-import birth_augur from "../../utils/birth_augur"
-import decorate from "../../utils/decorate"
-import hp from "../../utils/hp"
-import ability_modifier from "../../utils/modifier"
-import occupation from "../../utils/occupation"
+import { EXCLUDE_DESCRIPTION } from "../../../constants"
+import equipment from "../../../data/dcc/equipment"
+import weapon from "../../../data/dcc/weapon"
+import { Stats } from "../../../types"
+import birth_augur from "../../../utils/birth_augur"
+import decorate from "../../../utils/decorate"
+import hp from "../../../utils/hp"
+import ability_modifier from "../../../utils/modifier"
+import occupation from "../../../utils/occupation"
 
 export default {
   filename: 'DCC_GF_L0_4up_sketchy-square.pdf',

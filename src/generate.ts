@@ -4,13 +4,15 @@ import { RGB } from 'pdf-lib'
 import process_pdf from './process_pdf'
 import { DrawTextStyle, PDF, Point } from './types'
 
-
 declare global {
   // eslint-disable-next-line no-var
   var system: string | undefined
 }
 
-const generate = async ([sheetname, level = '1']: string[]) => {
+const generate = async (sheetname: string, level = '1') => {
+  if (!sheetname) {
+    throw new Error('No sheetname provided')
+  }
 
   const resolvedPath = path.resolve('src/character_sheets/' + sheetname + '.ts')
   const sheet = (await import(resolvedPath)).default as PDF
