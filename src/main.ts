@@ -23,4 +23,4 @@ files.forEach(async (file) => {
 })
 
 // const result = await generate(args.slice(2))
-// console.log(process.cwd() + '/' + result)
+// console.log(process.cwd() + '/' + result

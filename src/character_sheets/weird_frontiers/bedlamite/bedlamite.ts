@@ -1,73 +1,66 @@
-import { D12 } from "@randsum/dice"
-import weapon from "../../../data/weird_frontiers/weapon"
+import { merge } from "lodash/fp"
 import { Stats } from "../../../types"
 import birth_augur from "../../../utils/birth_augur"
-import damage from "../../../utils/damage"
 import decorate from "../../../utils/decorate"
-import firearm from "../../../utils/firearm"
-import hp from "../../../utils/hp"
 import ability_modifier from "../../../utils/modifier"
-import occupation from "../../../utils/occupation"
+import base from "../index"
 
-export default {
-  filename: 'bedlamite_blank_v1.pdf',
-  system: 'weird_frontiers',
-  style: { font_size: 22 },
-  fields: { 
-    str: { x: 32, y: 638, calc: (scores: Stats) => scores['str'] },
-    str_mod: { x: 60, y: 638, calc: (scores: Stats) => decorate(ability_modifier(scores['str']), ['+']) },
-    agl: { x: 32, y: 594, calc: (scores: Stats) => scores['agl'] },
-    agl_mod: { x: 60, y: 594, calc: (scores: Stats) => decorate(ability_modifier(scores['agl']), ['+']) },
-    sta: { x: 32, y: 550, calc: (scores: Stats) => scores['sta'] },
-    sta_mod: { x: 60, y: 550, calc: (scores: Stats) => decorate(ability_modifier(scores['sta']), ['+']) },
-    per: { x: 32, y: 505, calc: (scores: Stats) => scores['per'] },
-    per_mod: { x: 60, y: 505, calc: (scores: Stats) => decorate(ability_modifier(scores['per']), ['+']) },
-    int: { x: 32, y: 462, calc: (scores: Stats) => scores['int'] },
-    int_mod: { x: 60, y: 462, calc: (scores: Stats) => decorate(ability_modifier(scores['int']), ['+']) },
-    luck: { x: 32, y: 420, calc: (scores: Stats) => scores['luck'] },
-    luck_mod: { x: 60, y: 420, calc: (scores: Stats) => decorate(ability_modifier(scores['luck']), ['+']) },
-    ref: { x: 100, y: 595, calc: (scores: Stats) => decorate(ability_modifier(scores['agl'], 1), ['+']) },
-    fort: { x: 100, y: 550, calc: (scores: Stats) => decorate(ability_modifier(scores['sta']), ['+']) },
-    will: { x: 100, y: 505, calc: (scores: Stats) => decorate(ability_modifier(scores['per'], 1), ['+']) },
-    grit: {
-      x: 94, y: 470, calc: (scores: Stats) => Math.floor((scores['per'] + scores['sta']) / 2),
-      style: { size: 6, maxWidth: 20, lineHeight: 7 }
-    },
-    level: { x: 30, y: 715, calc: () => 1 },
-    hp: { x: 200, y: 635, calc: (scores: Stats) => hp(scores, '1d8') },
-    crit: { x: 250, y: 635, calc: () => 'd6' },
-    fumble: { x: 285, y: 635, calc: () => 'd12' },
-    wealth: { x: 280, y: 685, calc: () => '$' + D12.roll(), style: { size: 18 } },
-    birth_augur: {
-      x: 80, y: async (scores: Stats) => (await birth_augur(scores)).length >= 78 ? 396 : 390,
-      calc: async (scores: Stats) => await birth_augur(scores),
-      style: { size: 7, maxWidth: 200, lineHeight: 10 }
-    },
-    // birth_augur_description: {
-    //   x: 80, y: 392,
-    //   calc: (scores: Stats) => birth_augur_description(scores),
-    //   style: { size: 6, maxWidth: 200, lineHeight: 7 }
-    // },
-    action_die: { x: 37, y: 687, calc: () => 20 },
-    occupation: { x: 220, y: 715, calc: (scores: Stats) => occupation(scores) },
-    weapon: {
-      x: 150, y: 447, calc: (scores: Stats) => weapon(scores),
-      style: { size: 6 }
-    },
-    firearm: {
-      x: 150, y: 582, calc: (scores: Stats) => firearm(scores),
-      style: { size: 6 } 
-    },
-    damage: {
-      x: 205, y: 447, calc: (scores: Stats) => damage(scores),
-      style: { size: 6 }
-    },
-    // trade_good: [{
-    //   x: 150, y: 450, calc: (scores: Stats) => {
-    //     const trade_good = occupations[scores['occupation']].trade_good
-    //     return trade_good.substring(0, trade_good.indexOf('(') - 1)
-    //   }
-    // }],
+export default (() => {
 
-  }
-}
+  return merge(base, {
+    filename: 'bedlamite_blank_v1.pdf',
+    fields: {
+      str: { x: 32, y: 638 },
+      str_mod: { x: 60, y: 638 },
+      agl: { x: 32, y: 594 },
+      agl_mod: { x: 60, y: 594 },
+      sta: { x: 32, y: 550 },
+      sta_mod: { x: 60, y: 550 },
+      per: { x: 32, y: 505 },
+      per_mod: { x: 60, y: 505 },
+      int: { x: 32, y: 462 },
+      int_mod: { x: 60, y: 462 },
+      luck: { x: 32, y: 420 },
+      luck_mod: { x: 60, y: 420 },
+      ref: { x: 100, y: 595, calc: (scores: Stats) => decorate(ability_modifier(scores['agl'], 1), ['+']) },
+      fort: { x: 100, y: 550, },
+      will: { x: 100, y: 505, calc: (scores: Stats) => decorate(ability_modifier(scores['per'], 1), ['+']) },
+      grit: { x: 96, y: 469 },
+      level: { x: 30, y: 715 },
+      hp: { x: 200, y: 635, dice: (level: number) => '1d8' },
+      crit: { x: 250, y: 635, dice: (level: number) => '1d6' },
+      fumble: { x: 285, y: 635, dice: (level: number) => '1d12' },
+      wealth: { x: 280, y: 685, dice: (level: number) => '1d12' },
+      birth_augur: {
+        x: 80, y: async (scores: Stats) => (await birth_augur(scores)).length >= 78 ? 396 : 390,
+        style: { size: 7, maxWidth: 200, lineHeight: 10 }
+      },
+      // birth_augur_description: {
+      //   x: 80, y: 392,
+      //   calc: (scores: Stats) => birth_augur_description(scores),
+      //   style: { size: 6, maxWidth: 200, lineHeight: 7 }
+      // },
+      action_die: { x: 37, y: 687 },
+      occupation: { x: 220, y: 715 },
+      weapon: {
+        x: 150, y: 447,
+        style: { size: 12, maxWidth: 50, lineHeight: 9 }
+      },
+      firearm: {
+        x: 150, y: 582,
+        style: { size: 6 }
+      },
+      damage: {
+        x: 205, y: 447,
+        style: { size: 12 }
+      },
+      // trade_good: [{
+      //   x: 150, y: 450, calc: (scores: Stats) => {
+      //     const trade_good = occupations[scores['occupation']].trade_good
+      //     return trade_good.substring(0, trade_good.indexOf('(') - 1)
+      //   }
+      // }],
+
+    }
+  })
+})()                

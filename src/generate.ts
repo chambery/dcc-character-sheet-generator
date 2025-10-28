@@ -2,7 +2,7 @@ import { D100, D20, D6, roll } from '@randsum/dice'
 import path from 'path'
 import { RGB } from 'pdf-lib'
 import process_pdf from './process_pdf'
-import { DrawTextStyle, PDF, Point } from './types'
+import { DrawTextStyle, Point } from './types'
 
 declare global {
   // eslint-disable-next-line no-var
@@ -15,7 +15,10 @@ const generate = async (sheetname: string, level = '1') => {
   }
 
   const resolvedPath = path.resolve('src/character_sheets/' + sheetname + '.ts')
-  const sheet = (await import(resolvedPath)).default as PDF
+  
+  const sheet = (await import(resolvedPath)).default
+  console.log('typeof sheet', typeof sheet)
+  
   globalThis.system = sheet.system as string
   console.log('system', globalThis.system)
 
@@ -45,9 +48,10 @@ const generate = async (sheetname: string, level = '1') => {
   const sheets = await Promise.all(sheet.offset.map(async (offset: Point) => {
     const scores = roll_dice(Number(level) + 1)
     const texts: { x: number, y: number, text: string, style?: { size?: number, color?: RGB } }[] = []
+    // console.log('fields', sheet.fields, scores)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    await Promise.all(Object.entries(sheet.fields).map(async ([key, field]) => {
-      const value = String(await field.calc(scores))
+    await Promise.all(Object.entries(sheet.fields).map(async ([key, field]: [string, any]) => {
+      const value = String(await field.calc(scores, field.dice?.(level)))
       if (value == undefined) return
       const offsetStyle = offset_style(offset, (typeof field.style === 'function') ? await field.style(scores) : field.style)
       // if (offsetStyle.curve) console.log('\n\noffsetStyle curvature', offsetStyle.curve.curvature, '\n=======\n')

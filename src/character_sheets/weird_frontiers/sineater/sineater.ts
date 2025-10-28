@@ -29,7 +29,7 @@ export default  {
       fort: { x: 100, y: 546, calc: (scores: Stats) => decorate(ability_modifier(scores['sta'], 1), ['+']) },
       will: { x: 100, y: 503, calc: (scores: Stats) => decorate(ability_modifier(scores['per'], 2), ['+']) },
       grit: {
-        x: 94, y: 470, calc: (scores: Stats) => Math.floor((scores['per'] + scores['sta']) / 2),
+        x: 94, y: 470, 
         style: { size: 6, maxWidth: 20, lineHeight: 7 }
       },
 

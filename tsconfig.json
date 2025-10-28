@@ -1,13 +1,21 @@
 {
   "files": [],
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
   ],
   "compilerOptions": {
+    "baseUrl": ".",
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "paths": {
+      "@weird_frontiers/*": [
+        "./src/character_sheets/weird_frontiers/*"
+      ],
       "@data/*": [
         "./src/data/*"
       ],
