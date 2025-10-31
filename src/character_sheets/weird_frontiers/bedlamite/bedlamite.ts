@@ -3,11 +3,11 @@ import { Stats } from "../../../types"
 import birth_augur from "../../../utils/birth_augur"
 import decorate from "../../../utils/decorate"
 import ability_modifier from "../../../utils/modifier"
-import base from "../index"
+import base_wf from "../index"
 
 export default (() => {
 
-  return merge(base, {
+  return merge(base_wf, {
     filename: 'bedlamite_blank_v1.pdf',
     fields: {
       str: { x: 32, y: 638 },
@@ -43,16 +43,13 @@ export default (() => {
       action_die: { x: 37, y: 687 },
       occupation: { x: 220, y: 715 },
       weapon: {
-        x: 150, y: 447,
-        style: { size: 12, maxWidth: 50, lineHeight: 9 }
+        x: 150, y: 447, style: { size: 12, maxWidth: 50, lineHeight: 9 }
       },
       firearm: {
-        x: 150, y: 582,
-        style: { size: 6 }
+        x: 150, y: 582, style: { size: 6 }
       },
       damage: {
-        x: 205, y: 447,
-        style: { size: 12 }
+        x: 205, y: 447, style: { size: 12 }
       },
       // trade_good: [{
       //   x: 150, y: 450, calc: (scores: Stats) => {

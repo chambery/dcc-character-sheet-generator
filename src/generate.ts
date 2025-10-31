@@ -51,6 +51,7 @@ const generate = async (sheetname: string, level = '1') => {
     // console.log('fields', sheet.fields, scores)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     await Promise.all(Object.entries(sheet.fields).map(async ([key, field]: [string, any]) => {
+      // console.log(field)
       const value = String(await field.calc(scores, field.dice?.(level)))
       if (value == undefined) return
       const offsetStyle = offset_style(offset, (typeof field.style === 'function') ? await field.style(scores) : field.style)

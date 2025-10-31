@@ -3,11 +3,11 @@ import { Stats } from "../../../types"
 import birth_augur from "../../../utils/birth_augur"
 import decorate from "../../../utils/decorate"
 import ability_modifier from "../../../utils/modifier"
-import base from "../index"
+import base_wf from "../index"
 
 export default (() => {
 
-  return merge(base, {
+  return merge(base_wf, {
     filename: 'calavera_blank_v1.pdf',
     fields: {
       str: { x: 32, y: 638 },
@@ -22,12 +22,12 @@ export default (() => {
       int_mod: { x: 60, y: 462 },
       luck: { x: 32, y: 420 },
       luck_mod: { x: 60, y: 420 },
+
       ref: { x: 99, y: 591, calc: (scores: Stats) => decorate(ability_modifier(scores['agl'], 1), ['+']) },
       fort: { x: 99, y: 546 },
       will: { x: 99, y: 503, calc: (scores: Stats) => decorate(ability_modifier(scores['per'], 1), ['+']) },
-      grit: {
-        x: 94, y: 468
-      },
+
+      grit: { x: 94, y: 468 },
       level: { x: 30, y: 715 },
       hp: { x: 200, y: 630, dice: (level: number) => '1d8' },
       crit: { x: 249, y: 634, dice: (level: number) => '1d8' },
@@ -44,18 +44,9 @@ export default (() => {
       // },
       action_die: { x: 36, y: 685 },
       occupation: { x: 220, y: 715 },
-      weapon: {
-        x: 150, y: 445,
-        style: { size: 6, maxWidth: 50, lineHeight: 7 }
-      },
-      damage: { 
-        x: 210, y: 445,
-        style: { size: 6 }
-      },
-      firearm: {
-        x: 150, y: 582,
-        style: { size: 6 }
-      },
+      weapon: { x: 150, y: 445, style: { size: 6, maxWidth: 50, lineHeight: 7 } },
+      damage: { x: 210, y: 445, style: { size: 6 } },
+      firearm: { x: 150, y: 582, style: { size: 6 } },
     }
 
   })

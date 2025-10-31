@@ -69,7 +69,7 @@ const curve_text = async (
       2 * (1 - t) * t * controlY +
       t * t * endPoint.y
 
-    // Calculate rotation based on curve tangent
+    // Calculate rotation base_wfd on curve tangent
     const nextT = Math.min(t + 0.01, 1)
     const nextX =
       Math.pow(1 - nextT, 2) * startPoint.x +

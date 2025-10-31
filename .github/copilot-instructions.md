@@ -35,8 +35,8 @@ export default {
 
 **Weird Frontiers sheets** use inheritance via `lodash/fp.merge()`:
 ```typescript
-import base from '../index'
-export default (() => merge(base, { /* overrides */ }))()
+import base_wf from '../index'
+export default (() => merge(base_wf, { /* overrides */ }))()
 ```
 
 ### Field Calculation System
@@ -113,7 +113,7 @@ calc: async (scores: Stats) => await occupation(scores)
 1. Place blank PDF in `assets/`
 2. Use `designer.html` to find field coordinates
 3. Create config in `src/character_sheets/<system>/<class>/`
-4. For Weird Frontiers, extend `src/character_sheets/weird_frontiers/index.ts` base
+4. For Weird Frontiers, extend `src/character_sheets/weird_frontiers/index.ts` base_wf
 5. Run generator: `bun src/main.ts <system>/<class> <level>`
 
 ## Dependencies

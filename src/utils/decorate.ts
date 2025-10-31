@@ -2,7 +2,7 @@ import _ from "lodash"
 
 
 /**
- * Decorates a value based on the provided parameters.
+ * Decorates a value base_wfd on the provided parameters.
  * @param val value to decorate
  * @param params array of decorater to apply to the value, in order
  * 

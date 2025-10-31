@@ -4,11 +4,11 @@ import birth_augur from "../../../utils/birth_augur"
 import birth_augur_description from "../../../utils/birth_augur_description"
 import decorate from "../../../utils/decorate"
 import ability_modifier from "../../../utils/modifier"
-import base from "../index"
+import base_wf from "../index"
 
 export default (() => {
 
-  return merge(base, {
+  return merge(base_wf, {
     filename: 'gunslinger_blank_v1.pdf',
     style: { font_size: 22 },
     fields: {
@@ -48,8 +48,14 @@ export default (() => {
       weapon: { x: 150, y: 457, style: { size: 12, maxWidth: 50, lineHeight: 9 } },
       damage: { x: 205, y: 457, style: { size: 12 } },
       firearm: { x: 150, y: 585, style: { size: 12, maxWidth: 50, lineHeight: 9 } },
-      critical_threat_range: { x: 555, y: 755, calc: () => '19-20' },
-      deadeye_die: { x: 565, y: 680, calc: () => 'd3' }
+      critical_threat_range: {
+        x: 555, y: 755,
+        calc: (level: number) => '19-20'
+      },
+      deadeye_die: {
+        x: 565, y: 680,
+        calc: (level: number) => 'd3'
+      }
 
     }
   })

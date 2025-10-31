@@ -341,7 +341,7 @@
             const originalPdfWidth = pdfLibPage.getSize().width
             // For landscape, X in codeText comes from loc.y (PDF point)
             outputCodeX = Math.round(loc.y)
-            // The Y ('actually') is already calculated based on markerDisplayYOnCanvas,
+            // The Y ('actually') is already calculated base_wfd on markerDisplayYOnCanvas,
             // and getDisplayCoordinates handles the visual landscape transformation for the marker.
             // So, 'actually' should correctly reflect the transformed Y perspective.
           }

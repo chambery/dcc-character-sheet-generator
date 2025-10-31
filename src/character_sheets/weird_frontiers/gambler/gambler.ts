@@ -1,16 +1,13 @@
 import { merge } from "lodash/fp"
-import weapon from "../../../data/weird_frontiers/weapon"
 import { Stats } from "../../../types"
 import birth_augur from "../../../utils/birth_augur"
-import damage from "../../../utils/damage"
 import decorate from "../../../utils/decorate"
-import firearm from "../../../utils/firearm"
 import ability_modifier from "../../../utils/modifier"
-import base from "../index"
+import base_wf from "../index"
 
 export default (() => {
 
-  return merge(base, {
+  return merge(base_wf, {
     filename: './gambler_blank_v1.pdf',
     fields: {
       str: { x: 32, y: 638 },
@@ -36,7 +33,6 @@ export default (() => {
       wealth: { x: 340, y: 695, dice: (level: number) => '1d12' },
       birth_augur: {
         x: 80, y: async (scores: Stats) => (await birth_augur(scores)).length >= 78 ? 396 : 390,
-        calc: async (scores: Stats) => await birth_augur(scores),
         style: { size: 7, maxWidth: 223, lineHeight: 6 }
       },
       // birth_augur_description: {
@@ -44,21 +40,15 @@ export default (() => {
       //   calc: (scores: Stats) => birth_augur_description(scores),
       //   style: { size: 6, maxWidth: 200, lineHeight: 7 }
       // },
-      action_die: { x: 39, y: 687, calc: () => 20 },
+      action_die: { x: 39, y: 687 },
       occupation: { x: 220, y: 715 },
-      weapon: {
-        x: 150, y: 445, calc: (scores: Stats) => weapon(scores),
-        style: { size: 6, maxWidth: 50, lineHeight: 7 }
+      weapon: { x: 150, y: 445, style: { size: 6, maxWidth: 50, lineHeight: 7 } },
+      damage: { x: 210, y: 445, style: { size: 6 } },
+      firearm: { x: 150, y: 582, style: { size: 6 } },
+      mojo_die: {
+        x: 94, y: 292,
+        calc: (level: number) => '+d3'
       },
-      damage: {
-        x: 210, y: 445, calc: (scores: Stats) => damage(scores),
-        style: { size: 6 }
-      },
-      firearm: {
-        x: 150, y: 582, calc: (scores: Stats) => firearm(scores),
-        style: { size: 6 }
-      },
-      mojo_die: { x: 94, y: 292, calc: () => '+d3' },
     }
 
   })

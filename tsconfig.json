@@ -9,7 +9,7 @@
     }
   ],
   "compilerOptions": {
-    "baseUrl": ".",
+    "base_wfUrl": ".",
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "paths": {

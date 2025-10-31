@@ -5,7 +5,6 @@ import ability_modifier from "./modifier"
 
 
 const hp = (scores: Stats, hd: NumericDiceNotation) => {
-  console.log('hp:  scores', scores, 'hd', hd)
   if (isEmpty(hd)) { throw Error('Hit dice cannot be empty and must be in NumericDiceNotation') }
 
   const sta_mod = ability_modifier(scores['sta'])
